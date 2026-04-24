@@ -872,6 +872,368 @@
       margin-top: 14px;
     }
 
+    .resume-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 54;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.92);
+      padding: 12px;
+    }
+
+    .resume-panel.open {
+      display: grid;
+    }
+
+    .resume-panel:focus {
+      outline: none;
+    }
+
+    .resume-panel .resume-box {
+      display: flex;
+      flex-direction: column;
+      background-color: #f2f2f0;
+      background-image: none;
+      border: 1px solid #b8b8b8;
+      color: #111;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.07);
+      box-shadow: none;
+      filter: none;
+      text-shadow: none;
+    }
+
+    .resume-panel .resume-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .resume-panel .resume-box::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .resume-panel .resume-box::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 6px;
+    }
+
+    .resume-panel .resume-box::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.32);
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .resume-panel .resume-title {
+      color: #111;
+      text-shadow: none;
+    }
+
+    .resume-panel .resume-block,
+    .resume-panel .resume-tools-lang-stack {
+      box-shadow: none;
+      filter: none;
+      text-shadow: none;
+    }
+
+    .resume-panel .resume-block {
+      background: #ffffff;
+      border: 1px solid #c4c4c4;
+    }
+
+    .resume-panel .resume-simple-list li {
+      color: #1a1a1a;
+    }
+
+    .resume-panel .resume-simple-list strong {
+      color: #5c5c5c;
+      font-weight: 700;
+    }
+
+    .resume-panel .resume-box .tag {
+      background: #fff;
+      color: #111;
+      border-color: #9a9a9a;
+      box-shadow: none;
+      font-size: 0.72rem;
+    }
+
+    .resume-panel .resume-box .tag.highlight {
+      color: var(--orange);
+      border-color: var(--orange);
+      background: #fff8f0;
+    }
+
+    .resume-box {
+      width: min(900px, 96vw);
+      max-height: 92vh;
+      overflow: auto;
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(200deg, #101114 0%, #08090b 100%);
+      padding: 18px 18px 14px;
+    }
+
+    .resume-title {
+      font-size: clamp(1.2rem, 3.6vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .resume-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .resume-tools-lang-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .resume-block {
+      border: 1px solid var(--border-dim);
+      background: rgba(255, 255, 255, 0.015);
+      padding: 10px;
+    }
+
+    .resume-block.full {
+      grid-column: 1 / -1;
+    }
+
+    .resume-block h4 {
+      font-family: "Share Tech Mono", monospace;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+    }
+
+    .resume-simple-list {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+
+    .resume-simple-list li {
+      color: var(--text);
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+
+    body.printing-resume > *:not(.resume-panel) {
+      display: none !important;
+    }
+
+    #a4ResumePrintRoot {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      border: 0;
+      white-space: nowrap;
+    }
+
+    body.printing-a4-only > *:not(#a4ResumePrintRoot) {
+      display: none !important;
+    }
+
+    body.printing-a4-only #a4ResumePrintRoot {
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      clip-path: none !important;
+      white-space: normal !important;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 4mm;
+    }
+
+    @media print {
+      html,
+      body {
+        height: auto !important;
+        min-height: 0 !important;
+        background: #050608 !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      html.printing-resume-sheet {
+        min-height: 289mm !important;
+        background: #ffffff !important;
+      }
+
+      body.printing-resume,
+      body.printing-a4-only {
+        margin: 0;
+        height: auto !important;
+        min-height: 289mm !important;
+        background: #ffffff !important;
+      }
+
+      html:has(body.printing-a4-only),
+      html:has(body.printing-resume) {
+        background: #ffffff !important;
+        min-height: 289mm !important;
+      }
+
+      body.printing-resume .resume-panel,
+      body.printing-a4-only #a4ResumePrintRoot {
+        position: static !important;
+        inset: auto !important;
+        display: block !important;
+        height: auto !important;
+        min-height: 289mm !important;
+        background: transparent !important;
+        padding: 0 !important;
+      }
+
+      body.printing-resume .resume-box,
+      body.printing-a4-only #a4ResumePrintRoot .resume-box {
+        display: flex !important;
+        flex-direction: column !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        min-height: 289mm !important;
+        overflow: visible !important;
+        border: 1px solid #b8b8b8 !important;
+        background-color: #f2f2f0 !important;
+        background-image: none !important;
+        color: #111 !important;
+        box-shadow: none !important;
+        filter: none !important;
+        text-shadow: none !important;
+        padding: 4.5mm !important;
+        transform: none !important;
+      }
+
+      body.printing-resume .resume-title,
+      body.printing-a4-only #a4ResumePrintRoot .resume-title {
+        font-size: 18pt !important;
+        margin-bottom: 2.8mm !important;
+        letter-spacing: 0.08em !important;
+        color: #111 !important;
+        text-shadow: none !important;
+        filter: none !important;
+      }
+
+      body.printing-resume .resume-grid,
+      body.printing-a4-only #a4ResumePrintRoot .resume-grid {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        align-content: start !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 2.8mm !important;
+      }
+
+      body.printing-resume .resume-tools-lang-stack,
+      body.printing-a4-only #a4ResumePrintRoot .resume-tools-lang-stack {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2.8mm !important;
+        min-width: 0 !important;
+        box-shadow: none !important;
+        filter: none !important;
+      }
+
+      body.printing-resume .resume-block,
+      body.printing-a4-only #a4ResumePrintRoot .resume-block {
+        grid-column: auto !important;
+        padding: 2.6mm !important;
+        background: #ffffff !important;
+        border: 1px solid #c4c4c4 !important;
+        box-shadow: none !important;
+        filter: none !important;
+        text-shadow: none !important;
+      }
+
+      body.printing-resume .resume-block.full,
+      body.printing-a4-only #a4ResumePrintRoot .resume-block.full {
+        grid-column: 1 / -1 !important;
+        padding: 2.6mm !important;
+        background: #ffffff !important;
+        border: 1px solid #c4c4c4 !important;
+        box-shadow: none !important;
+        filter: none !important;
+        text-shadow: none !important;
+      }
+
+      body.printing-resume .resume-block h4,
+      body.printing-a4-only #a4ResumePrintRoot .resume-block h4 {
+        font-size: 11.5pt !important;
+        margin-bottom: 1.4mm !important;
+        color: #e8943a !important;
+      }
+
+      body.printing-resume .resume-simple-list,
+      body.printing-a4-only #a4ResumePrintRoot .resume-simple-list {
+        gap: 1.35mm !important;
+      }
+
+      body.printing-resume .resume-simple-list li,
+      body.printing-a4-only #a4ResumePrintRoot .resume-simple-list li {
+        font-size: 10.5pt !important;
+        line-height: 1.38 !important;
+        color: #1a1a1a !important;
+      }
+
+      body.printing-resume .resume-simple-list strong,
+      body.printing-a4-only #a4ResumePrintRoot .resume-simple-list strong {
+        color: #5c5c5c !important;
+        font-weight: 700 !important;
+      }
+
+      body.printing-resume .tags,
+      body.printing-a4-only #a4ResumePrintRoot .tags {
+        gap: 1.5mm !important;
+      }
+
+      body.printing-resume .tag,
+      body.printing-a4-only #a4ResumePrintRoot .tag {
+        font-size: 9.5pt !important;
+        padding: 0.7mm 1.35mm !important;
+        letter-spacing: 0.04em !important;
+        color: #111 !important;
+        border-color: #9a9a9a !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        filter: none !important;
+        text-shadow: none !important;
+      }
+
+      body.printing-resume .tag.highlight,
+      body.printing-a4-only #a4ResumePrintRoot .tag.highlight {
+        color: #e8943a !important;
+        border-color: #e8943a !important;
+        background: #fff8f0 !important;
+        box-shadow: none !important;
+        filter: none !important;
+        text-shadow: none !important;
+      }
+
+      body.printing-resume .resume-block,
+      body.printing-a4-only #a4ResumePrintRoot .resume-block {
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+    }
+
     .companies-header {
       display: flex;
       align-items: center;
@@ -1267,6 +1629,16 @@
       .thanks-contacts {
         font-size: 0.68rem;
       }
+
+      .resume-box {
+        width: 96vw;
+        max-height: 94vh;
+        padding: 12px;
+      }
+
+      .resume-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 520px) {
@@ -1378,7 +1750,7 @@
     <div class="briefing-role" id="briefingRole">Pessoal</div>
     <div class="briefing-line"><span>STATUS //</span><span class="val" id="briefingStatus">DISPONÍVEL</span></div>
     <div class="briefing-line"><span>HABILIDADES //</span><span class="val" id="briefingSpecialty">GESTÃO E ESTRATÉGIA</span></div>
-    <div class="briefing-line"><span>INTERESSES //</span><span class="val" id="briefingInterests">CARROS</span></div>
+    <div class="briefing-line"><span id="briefingFourthLabel">INTERESSES //</span><span class="val" id="briefingInterests">CARROS</span></div>
     <div class="briefing-line"><span>TEMPO //</span><span class="val" id="briefingTime">--</span></div>
   </aside>
 
@@ -1439,6 +1811,14 @@
       <button type="button" class="close-btn thanks-close" id="closeThanksBtn">Fechar [ ESC ]</button>
     </div>
   </section>
+
+  <section class="resume-panel" id="resumePanel" aria-hidden="true" tabindex="-1">
+    <div class="resume-box" id="resumeSourceBox">
+      <div class="resume-title">Currículo</div>
+      <div class="resume-grid" id="resumeGrid"></div>
+    </div>
+  </section>
+  <div id="a4ResumePrintRoot" aria-hidden="true"></div>
 
   <script>
     const operators = [
@@ -1578,11 +1958,14 @@
     const loadingPanel = document.getElementById("loadingPanel");
     const thanksPanel = document.getElementById("thanksPanel");
     const closeThanksBtn = document.getElementById("closeThanksBtn");
+    const resumePanel = document.getElementById("resumePanel");
+    const resumeGrid = document.getElementById("resumeGrid");
     const briefingOperator = document.getElementById("briefingOperator");
     const briefingRole = document.getElementById("briefingRole");
     const briefingStatus = document.getElementById("briefingStatus");
     const briefingSpecialty = document.getElementById("briefingSpecialty");
     const briefingInterests = document.getElementById("briefingInterests");
+    const briefingFourthLabel = document.getElementById("briefingFourthLabel");
     const briefingTime = document.getElementById("briefingTime");
     const briefingPanel = document.querySelector(".briefing-panel");
     const taoaHud = document.getElementById("taoaHud");
@@ -1737,6 +2120,10 @@
       if (!loadingPanel) return;
       closeDossier({ skipHistory: true });
       closeCompaniesPanel({ skipHistory: true });
+      if (resumePanel) {
+        resumePanel.classList.remove("open");
+        resumePanel.setAttribute("aria-hidden", "true");
+      }
       if (thanksPanel) {
         thanksPanel.classList.remove("open");
         thanksPanel.setAttribute("aria-hidden", "true");
@@ -1782,6 +2169,213 @@
       loadingPanel.classList.remove("open");
       loadingPanel.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+    }
+
+    function getOperatorById(id) {
+      return operators.find((op) => op.id === id);
+    }
+
+    function renderResumePanel() {
+      if (!resumeGrid) return;
+      const martinelli = getOperatorById("OP-01");
+      const taoa = getOperatorById("OP-02");
+      const companies = getWorkedCompanies();
+
+      const dadosMartinelli = (martinelli?.dados || [])
+        .map((d) => `<li><strong>${d.label}:</strong> ${d.value}</li>`)
+        .join("");
+
+      const habilidadesMartinelli = (martinelli?.skills || [])
+        .map((s) => `<span class="tag">${s}</span>`)
+        .join("");
+      const habilidadesTaoa = (taoa?.skills || [])
+        .map((s) => `<span class="tag">${s}</span>`)
+        .join("");
+
+      const idiomas = (martinelli?.idiomas || [])
+        .map((lang) => `<span class="tag">${lang}</span>`)
+        .join("");
+
+      const contatos = [
+        "Telefone - (61) 9.9663-3075",
+        "E-mail - tmartinelliaraujo@gmail.com",
+        "Instagram - _.autonelli._",
+        "TikTok - garagedonelli",
+        "Git - tmartinelliaraujo-jpg",
+        "Linkedin -",
+        "Fiverr -"
+      ]
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      const detalhesMartinelli = (martinelli?.details || [])
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+      const detalhesTaoa = (taoa?.details || [])
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      const certificados = (taoa?.certificates || [])
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      const ferramentas = (taoa?.tools || [])
+        .map((item) => `<span class="tag">${item}</span>`)
+        .join("");
+
+      const empresas = companies
+        .map((company) => {
+          const tempo = company.startDate
+            ? company.endDate
+              ? formatElapsedBetween(company.startDate, company.endDate)
+              : formatElapsedSince(company.startDate)
+            : "N/A";
+          return `
+            <li>
+              <strong>${company.name}</strong><br />
+              Função: ${company.role || "N/A"}<br />
+              Tempo: ${tempo}<br />
+              Motivo de saída: ${company.reasonLeft || "N/A"}<br />
+              Aprendizado: ${company.learned || "N/A"}
+            </li>
+          `;
+        })
+        .join("");
+
+      resumeGrid.innerHTML = `
+        <section class="resume-block">
+          <h4>Dados</h4>
+          <ul class="resume-simple-list">${dadosMartinelli || "<li>N/A</li>"}</ul>
+        </section>
+
+        <section class="resume-block">
+          <h4>Contatos</h4>
+          <ul class="resume-simple-list">${contatos || "<li>N/A</li>"}</ul>
+        </section>
+
+        <section class="resume-block">
+          <h4>Habilidades</h4>
+          <div class="tags">${habilidadesMartinelli}${habilidadesTaoa}</div>
+        </section>
+
+        <div class="resume-tools-lang-stack">
+          <section class="resume-block">
+            <h4>Ferramentas</h4>
+            <div class="tags">${ferramentas || '<span class="tag">N/A</span>'}</div>
+          </section>
+
+          <section class="resume-block">
+            <h4>Idiomas</h4>
+            <div class="tags">${idiomas || '<span class="tag">N/A</span>'}</div>
+          </section>
+        </div>
+
+        <section class="resume-block full">
+          <h4>Detalhes</h4>
+          <ul class="resume-simple-list">
+            ${detalhesMartinelli}${detalhesTaoa || "<li>N/A</li>"}
+          </ul>
+        </section>
+
+        <section class="resume-block">
+          <h4>Certificados</h4>
+          <ul class="resume-simple-list">${certificados || "<li>N/A</li>"}</ul>
+        </section>
+
+        <section class="resume-block">
+          <h4>Empresas e detalhes</h4>
+          <ul class="resume-simple-list">${empresas || "<li>N/A</li>"}</ul>
+        </section>
+      `;
+    }
+
+    function openResumePanel() {
+      if (!resumePanel) return;
+      if (thanksPanel) {
+        thanksPanel.classList.remove("open");
+        thanksPanel.setAttribute("aria-hidden", "true");
+      }
+      if (loadingPanel) {
+        loadingPanel.classList.remove("open");
+        loadingPanel.setAttribute("aria-hidden", "true");
+      }
+      if (companiesPanel && companiesPanel.classList.contains("open")) {
+        closeCompaniesPanel({ skipHistory: true });
+      }
+      if (dossier.classList.contains("open")) {
+        closeDossier({ skipHistory: true });
+      }
+      renderResumePanel();
+      resumePanel.classList.add("open");
+      resumePanel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      history.pushState({ appModal: "resume" }, "", window.location.href);
+      resumePanel.focus();
+    }
+
+    function closeResumePanel(options = {}) {
+      if (!resumePanel) return;
+      if (!options.skipHistory && !handlingPopState && history.state && history.state.appModal) {
+        history.back();
+        return;
+      }
+      resumePanel.classList.remove("open");
+      resumePanel.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function getResumeSourceNodeByXPath() {
+      try {
+        const r = document.evaluate(
+          "/html/body/section[3]/div",
+          document,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        );
+        const n = r && r.singleNodeValue;
+        if (n && n.nodeType === 1) return n;
+      } catch (e) {
+        /* XPath indisponível */
+      }
+      return document.getElementById("resumeSourceBox") || document.querySelector("#resumePanel .resume-box");
+    }
+
+    function cloneResumeIntoA4Mount() {
+      const src = getResumeSourceNodeByXPath();
+      const mount = document.getElementById("a4ResumePrintRoot");
+      if (!src || !mount) return false;
+      const clone = src.cloneNode(true);
+      clone.removeAttribute("id");
+      clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+      clone.querySelectorAll("button").forEach((el) => el.remove());
+      mount.replaceChildren(clone);
+      return true;
+    }
+
+    function buildA4PrintFromResumeDom() {
+      renderResumePanel();
+      return cloneResumeIntoA4Mount();
+    }
+
+    function printCurriculo() {
+      const mount = document.getElementById("a4ResumePrintRoot");
+      let usedClone = !!(mount && mount.firstElementChild);
+      if (!usedClone) {
+        usedClone = buildA4PrintFromResumeDom();
+      }
+      document.documentElement.classList.add("printing-resume-sheet");
+      document.body.classList.remove("printing-resume", "printing-a4-only");
+      if (usedClone) {
+        document.body.classList.add("printing-a4-only");
+      } else {
+        document.body.classList.add("printing-resume");
+      }
+      window.requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.print();
+        }, 50);
+      });
     }
 
     function formatElapsedSince(startDate) {
@@ -2027,10 +2621,32 @@
     if (closeThanksBtn) closeThanksBtn.addEventListener("click", closeThanksPanel);
     overlay.addEventListener("click", closeCompaniesPanel);
 
+    window.addEventListener("afterprint", () => {
+      document.documentElement.classList.remove("printing-resume-sheet");
+      document.body.classList.remove("printing-resume", "printing-a4-only");
+      const mount = document.getElementById("a4ResumePrintRoot");
+      if (mount) mount.replaceChildren();
+    });
+
     document.addEventListener("keydown", (e) => {
+      const t = e.target;
+      const tag = t && t.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable)) {
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) {
+        e.preventDefault();
+        buildA4PrintFromResumeDom();
+        printCurriculo();
+        return;
+      }
       if (e.key === "Escape") {
         if (thanksPanel && thanksPanel.classList.contains("open")) {
           closeThanksPanel();
+          return;
+        }
+        if (resumePanel && resumePanel.classList.contains("open")) {
+          closeResumePanel();
           return;
         }
         if (loadingPanel && loadingPanel.classList.contains("open")) {
@@ -2049,6 +2665,8 @@
       handlingPopState = true;
       if (thanksPanel && thanksPanel.classList.contains("open")) {
         closeThanksPanel({ skipHistory: true });
+      } else if (resumePanel && resumePanel.classList.contains("open")) {
+        closeResumePanel({ skipHistory: true });
       } else if (loadingPanel && loadingPanel.classList.contains("open")) {
         closeLoadingPanel({ skipHistory: true });
       } else if (companiesPanel && companiesPanel.classList.contains("open")) {
@@ -2114,6 +2732,9 @@
       }
       if (briefingOperator) briefingOperator.textContent = op.codename.toUpperCase();
       if (briefingRole) briefingRole.textContent = op.id === "OP-01" ? "Pessoal" : "Profissional - Júnior";
+      if (briefingFourthLabel) {
+        briefingFourthLabel.textContent = op.id === "OP-02" ? "FERRAMENTAS //" : "INTERESSES //";
+      }
       if (briefingStatus) briefingStatus.textContent = "DISPONÍVEL";
       if (briefingSpecialty) {
         const listedSkills = Array.isArray(op.skills) ? op.skills.filter(Boolean) : [];
