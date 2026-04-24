@@ -117,8 +117,7 @@
     }
 
     .app > .top-bar,
-    .app > .section-head,
-    .app > .bottom-bar {
+    .app > .section-head {
       pointer-events: auto;
     }
 
@@ -693,35 +692,6 @@
         flex-basis: 100%;
         max-width: 100%;
       }
-    }
-
-    /* Bottom bar */
-    .bottom-bar {
-      margin-top: auto;
-      padding-top: 24px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      font-family: "Share Tech Mono", monospace;
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-    }
-
-    .keys {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .keys kbd {
-      display: inline-block;
-      padding: 2px 6px;
-      border: 1px solid var(--border-dim);
-      color: var(--text);
-      font-size: 0.65rem;
     }
 
     /* Modal / dossier */
@@ -2043,10 +2013,6 @@
         font-size: 0.52rem;
       }
 
-      .bottom-bar {
-        padding-top: 14px;
-        font-size: 0.6rem;
-      }
     }
   </style>
 </head>
@@ -2087,12 +2053,6 @@
     </div>
 
     <div class="lobby-spacer" aria-hidden="true"></div>
-
-    <footer class="bottom-bar">
-      <div class="keys">
-        <span><kbd>ESC</kbd> fechar dossier</span>
-      </div>
-    </footer>
   </div>
 
   <div class="lobby-operators" id="lobbyOperators">
