@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LOBBY — Seleção de Perfil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #050608;
+      --bg-mid: #0a0d14;
+      --bg-panel: rgba(14, 15, 18, 0.92);
+      --border-dim: rgba(255, 255, 255, 0.08);
+      --orange: #e8943a;
+      --orange-dim: rgba(232, 148, 58, 0.35);
+      --green-hud: #6ee7a8;
+      --red-alert: #e85a4a;
+      --text: #e8eaed;
+      --muted: #7a828c;
+      --grid: rgba(255, 255, 255, 0.022);
+      --lobby-glow: rgba(210, 120, 45, 0.14);
+      --lobby-cool: rgba(55, 85, 130, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: #000;
+      color: var(--text);
+      font-family: "Rajdhani", system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .lobby-scene {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .lobby-void {
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 50%;
+      background: #000;
+    }
+
+    .lobby-floor {
+      position: absolute;
+      z-index: 1;
+      left: -35%;
+      width: 170%;
+      top: 50%;
+      bottom: -18%;
+      background: #000;
+      transform: perspective(380px) rotateX(66deg);
+      transform-origin: 50% 0%;
+      border-top: none;
+      box-shadow: none;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, transparent 18%, transparent 58%, rgba(0, 0, 0, 0.65) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.4) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.4) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.22;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      box-shadow:
+        inset 0 0 200px rgba(0, 0, 0, 0.92),
+        inset 0 0 80px rgba(0, 0, 0, 0.65);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .app {
+      position: relative;
+      z-index: 5;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(12px, 3vw, 28px);
+      pointer-events: none;
+    }
+
+    .app > .top-bar,
+    .app > .section-head,
+    .app > .bottom-bar {
+      pointer-events: auto;
+    }
+
+    /* Top HUD bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 16px;
+      border: 1px solid var(--border-dim);
+      background: var(--bg-panel);
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: var(--orange);
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand-title span {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .ping {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--green-hud);
+      letter-spacing: 0.08em;
+    }
+
+    .tag-ready {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--bg-deep);
+      background: var(--orange);
+      padding: 4px 10px;
+      font-weight: 700;
+    }
+
+    .deploy-fab {
+      position: fixed;
+      bottom: clamp(22px, 4.2vw, 42px);
+      right: clamp(22px, 4.2vw, 42px);
+      z-index: 25;
+      cursor: pointer;
+      border: none;
+      margin: 0;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      padding: 8px 28px;
+      min-width: min(92vw, 320px);
+      letter-spacing: 0.16em;
+    }
+
+    .deploy-fab:hover {
+      filter: brightness(1.08);
+    }
+
+    .deploy-fab:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    /* Main title */
+    .section-head {
+      margin-top: clamp(20px, 4vw, 40px);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-head h1 {
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .section-head h1::after {
+      content: "";
+      display: block;
+      height: 3px;
+      width: 72px;
+      margin-top: 8px;
+      background: linear-gradient(90deg, var(--orange), transparent);
+    }
+
+    .section-head .duo-right {
+      text-align: right;
+    }
+
+    .section-head .duo-right::after {
+      margin-left: auto;
+      background: linear-gradient(90deg, transparent, var(--orange));
+    }
+
+    .companies-trigger h1 {
+      position: relative;
+    }
+
+    .companies-trigger h1::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 10px);
+      width: 8px;
+      height: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.55);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+      transform: translateX(-50%) rotate(45deg);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .companies-trigger {
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      padding: 0;
+      transition: transform 0.16s ease, filter 0.16s ease;
+      transform-origin: right bottom;
+    }
+
+    .companies-trigger:hover {
+      transform: scale(1.08);
+      filter: brightness(1.08);
+    }
+
+    .companies-trigger:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 4px;
+    }
+
+    .hint {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .lobby-spacer {
+      flex: 1;
+      min-height: 0;
+      pointer-events: none;
+    }
+
+    .briefing-panel {
+      position: fixed;
+      left: clamp(14px, 2.4vw, 28px);
+      top: 56%;
+      bottom: auto;
+      z-index: 8;
+      width: min(220px, 30vw);
+      min-height: 230px;
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(165deg, rgba(12, 14, 20, 0.9) 0%, rgba(7, 8, 12, 0.86) 100%);
+      padding: 14px 12px 16px;
+      pointer-events: none;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(calc(-50% + 8px));
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    }
+
+    .briefing-panel.is-right {
+      left: auto;
+      right: clamp(14px, 2.4vw, 28px);
+    }
+
+    .briefing-panel.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%);
+    }
+
+    .briefing-title {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .briefing-operator {
+      font-size: 1.02rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .briefing-role {
+      margin-top: 2px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .briefing-line {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-start;
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .briefing-line .val {
+      color: var(--green-hud);
+    }
+
+    /* Dois operadores sobre o piso (fora da UI, mesma pilha do cenário). */
+    .lobby-operators {
+      position: fixed;
+      z-index: 2;
+      left: 47%;
+      top: 56%;
+      transform: translate(-50%, -50%);
+      width: min(1040px, 96vw);
+      height: min(58vh, 520px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: min(20px, 2.5vw);
+      pointer-events: none;
+    }
+
+    .lobby-pick {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 480px;
+      height: 100%;
+      margin: 0;
+      padding: 0 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: auto;
+      transform-origin: 50% 100%;
+      transform: perspective(520px) rotateX(2.5deg);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .lobby-pick::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 2%;
+      width: 56%;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.16) 38%, rgba(255, 255, 255, 0) 78%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .lobby-pick:hover {
+      transform: perspective(520px) rotateX(2.5deg) translateY(-6px);
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+    }
+
+    .lobby-pick:hover::after {
+      opacity: 0.9;
+    }
+
+    .lobby-pick::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -2%;
+      width: 62%;
+      height: 86px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(ellipse 38% 26% at 28% 74%, rgba(245, 248, 252, 0.58) 0%, rgba(245, 248, 252, 0.22) 44%, transparent 78%),
+        radial-gradient(ellipse 44% 30% at 70% 72%, rgba(245, 248, 252, 0.54) 0%, rgba(245, 248, 252, 0.2) 48%, transparent 80%),
+        radial-gradient(ellipse 34% 24% at 50% 48%, rgba(245, 248, 252, 0.34) 0%, rgba(245, 248, 252, 0.14) 42%, transparent 76%);
+      filter: blur(12px);
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    @keyframes tireSmokeDrift {
+      0% {
+        opacity: 0.2;
+        transform: translateX(-50%) translateY(4px) scale(0.94);
+      }
+      50% {
+        opacity: 0.46;
+        transform: translateX(-50%) translateY(-5px) scale(1.05);
+      }
+      100% {
+        opacity: 0.2;
+        transform: translateX(-50%) translateY(4px) scale(0.94);
+      }
+    }
+
+    .op-nickname {
+      position: absolute;
+      top: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      border: 1px solid var(--border-dim);
+      background: rgba(8, 10, 14, 0.72);
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: transform 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    }
+
+    .lobby-pick:hover .op-nickname {
+      transform: translateX(-50%) scale(1.14);
+      border-color: var(--orange-dim);
+      color: #fff;
+    }
+
+    .lobby-pick:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 4px;
+    }
+
+    .lobby-pick-img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      object-position: bottom center;
+      pointer-events: none;
+      user-select: none;
+      mix-blend-mode: screen;
+      -webkit-mask-image:
+        radial-gradient(ellipse 60% 68% at 50% 74%, #000 54%, rgba(0, 0, 0, 0.9) 66%, rgba(0, 0, 0, 0.4) 78%, transparent 92%),
+        linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 30%, #000 100%);
+      mask-image:
+        radial-gradient(ellipse 60% 68% at 50% 74%, #000 54%, rgba(0, 0, 0, 0.9) 66%, rgba(0, 0, 0, 0.4) 78%, transparent 92%),
+        linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 16%, #000 30%, #000 100%);
+    }
+
+    .lobby-pick[data-op-index="1"] .lobby-pick-img {
+      transform: scale(1.09);
+      transform-origin: bottom center;
+    }
+
+    .lobby-pick[data-op-index="0"] .lobby-pick-img {
+      transform: translateY(8%);
+      transform-origin: bottom center;
+    }
+
+
+    /* Com dossie aberto: destaca o operador escolhido no lado esquerdo. */
+    .dossier-open .lobby-operators {
+      z-index: 45;
+      left: 0;
+      width: calc(100vw - min(520px, 100vw));
+      transform: translate(-6%, -50%);
+      justify-content: center;
+    }
+
+    .dossier-open .lobby-pick {
+      flex: 0 0 min(430px, 58vw);
+      max-width: min(430px, 58vw);
+      pointer-events: none;
+    }
+
+    .dossier-open .lobby-pick:not(.is-selected) {
+      opacity: 0;
+      transform: perspective(520px) rotateX(2.5deg) translateY(12px) scale(0.92);
+      filter: blur(1px);
+    }
+
+    .dossier-open .lobby-pick.is-selected {
+      opacity: 1;
+      pointer-events: auto;
+      transform: perspective(520px) rotateX(2.5deg);
+      filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.6));
+    }
+
+    .dossier-open .lobby-pick .op-nickname {
+      display: none;
+    }
+
+    .dossier-open .lobby-pick.is-selected::after {
+      opacity: 0.9;
+    }
+
+    .dossier-open .lobby-pick.is-selected::before {
+      opacity: 0.78;
+      animation: tireSmokeDrift 2.4s ease-in-out infinite;
+    }
+
+
+    .lobby-pick-img {
+      position: relative;
+      z-index: 1;
+    }
+
+    .taoa-hud {
+      position: fixed;
+      left: 33%;
+      top: 18%;
+      transform: translateX(-50%);
+      z-index: 46;
+      min-width: 380px;
+      max-width: min(46vw, 520px);
+      padding: 14px 16px;
+      border: none;
+      background: rgba(8, 10, 14, 0.82);
+      display: none;
+      pointer-events: none;
+    }
+
+    .taoa-hud-time {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--green-hud);
+      text-transform: uppercase;
+    }
+
+    .taoa-hud-name {
+      margin-top: 8px;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .taoa-hud-role {
+      margin-top: 8px;
+      font-size: 1.14rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .dossier-op-hud-active .taoa-hud {
+      display: block;
+    }
+
+    .dossier-op-hud-active .dossier-id,
+    .dossier-op-hud-active .dossier-name,
+    .dossier-op-hud-active .dossier-role {
+      display: none;
+    }
+
+    .dossier-op-hud-active .dossier-header-ticker-row {
+      justify-content: flex-end;
+    }
+
+    .dossier-open .lobby-pick.is-selected[data-op-index="0"] {
+      transform: perspective(520px) rotateX(2.5deg) translateX(62%) scale(1.12);
+    }
+
+    .dossier-open .lobby-pick.is-selected[data-op-index="1"] {
+      transform: perspective(520px) rotateX(2.5deg) translateX(-38%);
+    }
+
+    @media (max-width: 560px) {
+      .briefing-panel {
+        width: min(76vw, 240px);
+        min-height: 210px;
+        top: 50%;
+      }
+
+      .lobby-operators {
+        top: 58%;
+        width: 100%;
+        height: min(52vh, 440px);
+        gap: 8px;
+        padding: 0 10px;
+      }
+
+      .lobby-pick {
+        max-width: none;
+        padding: 0 2px;
+      }
+
+      .dossier-open .lobby-operators {
+        left: 34%;
+        width: min(78vw, 420px);
+      }
+
+      .dossier-open .lobby-pick,
+      .dossier-open .lobby-pick.is-selected {
+        flex-basis: 100%;
+        max-width: 100%;
+      }
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      margin-top: auto;
+      padding-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .keys {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .keys kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid var(--border-dim);
+      color: var(--text);
+      font-size: 0.65rem;
+    }
+
+    /* Modal / dossier */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dossier {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(520px, 100%);
+      height: 100%;
+      z-index: 50;
+      background: linear-gradient(200deg, #101114 0%, #08090b 100%);
+      border-left: 1px solid var(--border-dim);
+      box-shadow: -24px 0 60px rgba(0, 0, 0, 0.6);
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .dossier.open {
+      transform: translateX(0);
+    }
+
+    .companies-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.97);
+      width: min(560px, 92vw);
+      max-height: min(72vh, 620px);
+      z-index: 51;
+      background: linear-gradient(200deg, #101114 0%, #08090b 100%);
+      border: 1px solid var(--border-dim);
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.58);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .companies-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .loading-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 52;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.84);
+      backdrop-filter: blur(3px);
+    }
+
+    .loading-panel.open {
+      display: grid;
+    }
+
+    .loading-box {
+      width: min(520px, 92vw);
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(200deg, #101114 0%, #08090b 100%);
+      padding: 18px 18px 14px;
+    }
+
+    .loading-title {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+    }
+
+    .loading-text {
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .loading-bar {
+      width: 100%;
+      height: 10px;
+      border: 1px solid var(--border-dim);
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+    }
+
+    .loading-bar > span {
+      display: block;
+      width: 36%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      animation: loadingSweep 1.1s linear infinite;
+      transform: translateX(-120%);
+    }
+
+    @keyframes loadingSweep {
+      to { transform: translateX(320%); }
+    }
+
+    .thanks-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 53;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(4px);
+    }
+
+    .thanks-panel.open {
+      display: grid;
+    }
+
+    .thanks-box {
+      width: min(620px, 92vw);
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(200deg, #101114 0%, #08090b 100%);
+      padding: 20px 20px 16px;
+      text-align: center;
+    }
+
+    .thanks-title {
+      font-size: clamp(1.2rem, 3.6vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .thanks-text {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .thanks-contacts {
+      margin-top: 14px;
+      border-top: 1px solid var(--border-dim);
+      padding-top: 12px;
+      text-align: left;
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1.75;
+    }
+
+    .thanks-contacts-title {
+      color: var(--orange);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.12em;
+    }
+
+    .thanks-close {
+      margin-top: 14px;
+    }
+
+    .companies-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .companies-title {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+
+    .companies-body {
+      padding: 14px 16px 18px;
+      overflow-y: auto;
+    }
+
+    .companies-list {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .companies-item {
+      position: relative;
+      border: 1px solid var(--border-dim);
+      width: 100%;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.015);
+      cursor: pointer;
+      transition: border-color 0.16s ease, background-color 0.16s ease;
+    }
+
+    .companies-item:hover,
+    .companies-item:focus-visible,
+    .companies-item.is-selected {
+      border-color: var(--orange-dim);
+      background: rgba(232, 148, 58, 0.08);
+      outline: none;
+    }
+
+    .companies-item-time {
+      flex-shrink: 0;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      color: var(--green-hud);
+      text-transform: none;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .companies-detail {
+      margin-top: 14px;
+      border: 1px solid var(--border-dim);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .companies-detail.hidden {
+      display: none;
+    }
+
+    .companies-detail .exp-item {
+      padding: 10px 0;
+    }
+
+    .dossier-header {
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .dossier-header-main {
+      width: 100%;
+    }
+
+    .dossier-header-ticker-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .dossier-exit-btn {
+      padding: 6px 10px;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+    }
+
+    .dossier-id {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.58rem;
+      color: var(--green-hud);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dossier-name {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .dossier-role {
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 2px;
+      letter-spacing: 0.06em;
+    }
+
+    .close-btn {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid var(--border-dim);
+      color: var(--text);
+      padding: 8px 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .close-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .dossier-body {
+      padding: 18px 22px 28px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .block {
+      margin-bottom: 22px;
+    }
+
+    .block-title {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .block-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--orange-dim), transparent);
+    }
+
+    .exp-list {
+      list-style: none;
+    }
+
+    .exp-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .exp-item:last-child {
+      border-bottom: none;
+    }
+
+    .exp-org {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .dados-block .exp-org {
+      text-transform: none;
+      font-size: 0.88rem;
+      letter-spacing: 0.06em;
+      color: var(--orange);
+    }
+
+    .exp-meta {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.68rem;
+      color: var(--orange);
+      margin-top: 2px;
+      letter-spacing: 0.06em;
+    }
+
+    .exp-desc {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      padding: 5px 10px;
+      border: 1px solid var(--border-dim);
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .tag.highlight {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    @media (max-height: 520px) {
+      .lobby-floor {
+        transform: perspective(300px) rotateX(56deg);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .status-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="lobby-scene" aria-hidden="true">
+    <div class="lobby-void"></div>
+    <div class="lobby-floor"></div>
+  </div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="app">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">CURRICULO // LOBBY</span>
+        <div class="brand-title">Seleção <span>de perfil</span></div>
+      </div>
+      <div class="status-row">
+        <span class="ping" id="clock">SYNC — --:--</span>
+      </div>
+    </header>
+
+    <div class="section-head">
+      <h1>Duo</h1>
+      <button type="button" class="duo-right companies-trigger">
+        <h1>Empresas</h1>
+      </button>
+    </div>
+
+    <div class="lobby-spacer" aria-hidden="true"></div>
+
+    <footer class="bottom-bar">
+      <div class="keys">
+        <span><kbd>ESC</kbd> fechar dossier</span>
+      </div>
+    </footer>
+  </div>
+
+  <div class="lobby-operators" id="lobbyOperators">
+    <button type="button" class="lobby-pick" id="pickOp0" data-op-index="0">
+      <span class="op-nickname"></span>
+      <img class="lobby-pick-img" alt="" decoding="async" />
+    </button>
+    <button type="button" class="lobby-pick" id="pickOp1" data-op-index="1">
+      <span class="op-nickname"></span>
+      <img class="lobby-pick-img" alt="" decoding="async" />
+    </button>
+  </div>
+
+  <aside class="briefing-panel" aria-live="polite" aria-label="Briefing ativo do operador">
+    <div class="briefing-title">Briefing Ativo</div>
+    <div class="briefing-operator" id="briefingOperator">MARTINELLI</div>
+    <div class="briefing-role" id="briefingRole">Pessoal</div>
+    <div class="briefing-line"><span>STATUS //</span><span class="val" id="briefingStatus">DISPONÍVEL</span></div>
+    <div class="briefing-line"><span>HABILIDADES //</span><span class="val" id="briefingSpecialty">GESTÃO E ESTRATÉGIA</span></div>
+    <div class="briefing-line"><span>INTERESSES //</span><span class="val" id="briefingInterests">CARROS</span></div>
+    <div class="briefing-line"><span>TEMPO //</span><span class="val" id="briefingTime">--</span></div>
+  </aside>
+
+  <aside class="taoa-hud" id="taoaHud" aria-hidden="true">
+    <div class="taoa-hud-time" id="taoaHudTime">--</div>
+    <div class="taoa-hud-name" id="opHudName">TAOÃ ARAÚJO</div>
+    <div class="taoa-hud-role" id="opHudRole">Profissional - Júnior</div>
+  </aside>
+
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <button type="button" class="tag-ready deploy-fab" id="deployFab" aria-label="Pronto para deploy">
+    PRONTO PARA DEPLOY
+  </button>
+  <aside class="dossier" id="dossier" aria-hidden="true" role="dialog" aria-labelledby="dossierTitle">
+    <div class="dossier-header">
+      <div class="dossier-header-main">
+        <div class="dossier-header-ticker-row">
+          <div class="dossier-id" id="dossierId"></div>
+          <button type="button" class="close-btn dossier-exit-btn" id="closeBtn">Fechar [ ESC ]</button>
+        </div>
+        <h2 class="dossier-name" id="dossierTitle"></h2>
+        <p class="dossier-role" id="dossierRole"></p>
+      </div>
+    </div>
+    <div class="dossier-body" id="dossierBody"></div>
+  </aside>
+  <aside class="companies-panel" id="companiesPanel" aria-hidden="true" role="dialog" aria-labelledby="companiesTitle">
+    <header class="companies-header">
+      <div class="companies-title" id="companiesTitle">Empresas e atuações</div>
+      <button type="button" class="close-btn" id="closeCompaniesBtn">Fechar [ ESC ]</button>
+    </header>
+    <div class="companies-body">
+      <ul class="companies-list" id="companiesList"></ul>
+      <div class="companies-detail" id="companiesDetail"></div>
+    </div>
+  </aside>
+  <section class="loading-panel" id="loadingPanel" aria-hidden="true">
+    <div class="loading-box">
+      <div class="loading-title">Deploy</div>
+      <div class="loading-text">Processando aprovação do perfil...</div>
+      <div class="loading-bar"><span></span></div>
+    </div>
+  </section>
+  <section class="thanks-panel" id="thanksPanel" aria-hidden="true">
+    <div class="thanks-box">
+      <div class="thanks-title">Obrigado!</div>
+      <p class="thanks-text">Agradeço pelo seu tempo e pela oportunidade de análise do meu currículo.</p>
+      <div class="thanks-contacts">
+        <div class="thanks-contacts-title">Contatos:</div>
+        <div>Telefone - (61) 9.9663-3075</div>
+        <div>E-mail - tmartinelliaraujo@gmail.com</div>
+        <div>Instagram - _.autonelli._</div>
+        <div>TikTok - garagedonelli</div>
+        <div>Git -</div>
+        <div>Linkedin -</div>
+        <div>Fiverr -</div>
+      </div>
+      <button type="button" class="close-btn thanks-close" id="closeThanksBtn">Fechar [ ESC ]</button>
+    </div>
+  </section>
+
+  <script>
+    const operators = [
+      {
+        id: "OP-01",
+        codename: "Martinelli",
+        role: "Pessoal",
+        portrait: "assets/martinelli.png",
+        dados: [
+          { label: "Nome completo", value: "Taoã Augusto Martinelli de Araújo" },
+          { label: "Data de nascimento", value: "30/03/2007" },
+          { label: "Telefone", value: "(61) 9.96633075" },
+          { label: "E-mail", value: "tmartinelliaraujo@gmail.com" },
+          { label: "Cidade", value: "Cidade Ocidental" },
+          { label: "Estado", value: "Goias" },
+          { label: "Estado civil", value: "solteiro" }
+        ],
+        details: [
+          "Vontade de crescimento: busco evolucao continua, aprendizado constante e superacao de metas na vida pessoal."
+        ],
+        experiences: [
+          {
+            org: "Dono de micro-empresa",
+            period: "Atual",
+            desc: "Gestao e responsabilidade pela operacao, decisoes e crescimento do negocio."
+          },
+          {
+            org: "Morar no exterior",
+            period: "Experiencia de vida",
+            desc: "Imersao cultural, autonomia e adaptacao a um novo contexto no dia a dia."
+          },
+          {
+            org: "Morar sozinho",
+            period: "Atual",
+            desc: "Independencia, organizacao do cotidiano e planejamento pessoal."
+          }
+        ],
+        skills: [
+          "Comunicação",
+          "autogestao",
+          "gestao",
+          "adaptabilidade",
+          "pensamento critico",
+          "pensamento logico",
+          "pensamento analitico",
+          "proatividade",
+          "linguas",
+          "Fotografia",
+          "Filmaker",
+          "Editor de video"
+        ],
+        idiomas: ["ingles", "espanhol", "portugues"],
+        toolsSectionTitle: "Interesses",
+        tools: ["Carros", "Motos", "Computação", "jogos", "IA", "Momentos", "Relacionamento", "Familia", "aprendizado", "amizades"]
+      },
+      {
+        id: "OP-02",
+        codename: "Taoã Araújo",
+        role: "Profissional - Júnior",
+        portrait: "assets/taoa-scene.png",
+        details: [
+          "A atuacao em programacao comecou de forma recreativa no ensino medio, onde era feito automacoes, sistemas e ate mini games.",
+          "Trabalhar na area de programacao e uma escolha de todo dia evoluir profissional e pessoal.",
+          "Capacidade em liderar de forma pratica e empatica.",
+          "Aprendizado com curva media.",
+          "Aprendizado maior em pratica."
+        ],
+        experiences: [
+          {
+            org: "Automações",
+            period: "Atuacao recorrente",
+            desc: "Criacao de fluxos para reduzir tarefas manuais, padronizar processos e aumentar produtividade em rotinas operacionais."
+          },
+          {
+            org: "Engenharia de prompt",
+            period: "Aplicacao pratica",
+            desc: "Construcao e refinamento de prompts para melhorar qualidade de respostas, consistencia e eficiencia em solucoes com IA."
+          },
+          {
+            org: "Projetos e colaboracao",
+            period: "Execucao em equipe",
+            desc: "Conducao de entregas com times multidisciplinares, alinhando objetivos, escopo e qualidade tecnica."
+          },
+          {
+            org: "Ensinar",
+            period: "Compartilhamento continuo",
+            desc: "Mentoria e repasse de conhecimento tecnico para acelerar aprendizado de pessoas e fortalecer o time."
+          },
+          {
+            org: "Liderar",
+            period: "Atuacao em times",
+            desc: "Coordenacao de pessoas e prioridades para manter foco, ritmo de entrega e qualidade nas execucoes."
+          },
+          {
+            org: "Designers",
+            period: "Colaboracao constante",
+            desc: "Trabalho proximo com designers para transformar requisitos em interfaces funcionais, coerentes e com boa experiencia."
+          },
+          {
+            org: "Ingles de nivel medio",
+            period: "Vivencia internacional",
+            desc: "Desenvolvimento do idioma com experiencia pratica apos morar no exterior por um ano."
+          },
+          {
+            org: "Vibe code",
+            period: "Pratica continua",
+            desc: "Desenvolvimento acelerado com apoio de IA, iterando rapido de ideia a prototipo funcional."
+          }
+        ],
+        certificates: [
+          "Python I 40Hrs - Curso em Video",
+          "Python II 40Hrs - curso em Video",
+          "Python III 40Hrs - Curso em Video",
+          "inteligencia Artificial I 40Hrs - Curso em Video",
+          "HTML I 40Hrs - Curso em Video",
+          "CSS I 40Hrs - Curso em Video",
+          "Kubernets 17Hrs - Udemy"
+        ],
+        skills: ["Python III", "JavaScript II", "TypeScript I", "HTML II", "CSS II", "React II", "Node I", "Rest II", "Testes II", "Ingles II"],
+        tools: ["vscode", "cursor", "antigravity", "flutterflow", "mulesoft", "github", "gitlab", "docker", "postman", "figma", "N8n", "RPA", "Kubernets"]
+      }
+    ];
+
+    const overlay = document.getElementById("overlay");
+    const dossier = document.getElementById("dossier");
+    const dossierId = document.getElementById("dossierId");
+    const dossierTitle = document.getElementById("dossierTitle");
+    const dossierRole = document.getElementById("dossierRole");
+    const dossierBody = document.getElementById("dossierBody");
+    const closeBtn = document.getElementById("closeBtn");
+    const companiesTrigger = document.querySelector(".companies-trigger");
+    const companiesPanel = document.getElementById("companiesPanel");
+    const companiesList = document.getElementById("companiesList");
+    const companiesDetail = document.getElementById("companiesDetail");
+    const closeCompaniesBtn = document.getElementById("closeCompaniesBtn");
+    const deployFab = document.getElementById("deployFab");
+    const loadingPanel = document.getElementById("loadingPanel");
+    const thanksPanel = document.getElementById("thanksPanel");
+    const closeThanksBtn = document.getElementById("closeThanksBtn");
+    const briefingOperator = document.getElementById("briefingOperator");
+    const briefingRole = document.getElementById("briefingRole");
+    const briefingStatus = document.getElementById("briefingStatus");
+    const briefingSpecialty = document.getElementById("briefingSpecialty");
+    const briefingInterests = document.getElementById("briefingInterests");
+    const briefingTime = document.getElementById("briefingTime");
+    const briefingPanel = document.querySelector(".briefing-panel");
+    const taoaHud = document.getElementById("taoaHud");
+    const taoaHudTime = document.getElementById("taoaHudTime");
+    const opHudName = document.getElementById("opHudName");
+    const opHudRole = document.getElementById("opHudRole");
+    const lastBriefingSkillByOp = {};
+    const lastBriefingInterestByOp = {};
+    let activeBriefingOperatorId = "OP-01";
+    const lifeStartDate = new Date(2007, 2, 30, 8, 32, 0);
+    const experienceStartDate = new Date(2024, 6, 27, 0, 0, 0);
+    let experienceTimer = null;
+    let dossierTimeMode = null;
+    let loadingTimer = null;
+    let selectedCompanyIdx = 0;
+    const companiesAndRoles = [
+      {
+        name: "Zello Tecnologia",
+        startDate: new Date(2025, 5, 21, 0, 0, 0),
+        endDate: null,
+        role: "Desenvolvedor - Full Stack",
+        reasonLeft: "Atualmente na empresa",
+        learned:
+          "Aprimorei automacoes, colaboracao com equipes e desenvolvimento orientado a entrega com qualidade."
+      }
+    ];
+
+    function getWorkedCompanies() {
+      return companiesAndRoles;
+    }
+
+    function renderCompaniesList() {
+      if (!companiesList) return;
+      const items = getWorkedCompanies();
+      companiesList.innerHTML = items
+        .map((company, idx) => {
+          const id = `companyTime${idx}`;
+          const elapsed = company.startDate ? formatElapsedSince(company.startDate) : "N/A";
+          return `<li>
+            <button type="button" class="companies-item${idx === selectedCompanyIdx ? " is-selected" : ""}" data-company-index="${idx}">
+              <span>${company.name}</span>
+              <span class="companies-item-time" id="${id}">${elapsed}</span>
+            </button>
+          </li>`;
+        })
+        .join("");
+      companiesList.querySelectorAll(".companies-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selectedCompanyIdx = Number(btn.dataset.companyIndex);
+          renderCompaniesList();
+          if (companiesDetail) companiesDetail.classList.remove("hidden");
+          renderCompanyDetails(selectedCompanyIdx);
+          updateCompaniesTimers();
+        });
+      });
+    }
+
+    function renderCompanyDetails(idx) {
+      if (!companiesDetail) return;
+      const company = getWorkedCompanies()[idx];
+      if (!company) {
+        companiesDetail.innerHTML = "";
+        return;
+      }
+      const timeText = company.startDate
+        ? company.endDate
+          ? formatElapsedBetween(company.startDate, company.endDate)
+          : formatElapsedSince(company.startDate)
+        : "N/A";
+      companiesDetail.innerHTML = `
+        <h3 class="block-title">Informações da empresa</h3>
+        <ul class="exp-list">
+          <li class="exp-item">
+            <div class="exp-org">Empresa</div>
+            <p class="exp-desc">${company.name}</p>
+          </li>
+          <li class="exp-item">
+            <div class="exp-org">Tempo</div>
+            <p class="exp-desc">${timeText}</p>
+          </li>
+          <li class="exp-item">
+            <div class="exp-org">Motivo de saída</div>
+            <p class="exp-desc">${company.reasonLeft || "N/A"}</p>
+          </li>
+          <li class="exp-item">
+            <div class="exp-org">Função</div>
+            <p class="exp-desc">${company.role || "N/A"}</p>
+          </li>
+          <li class="exp-item">
+            <div class="exp-org">O que aprendi</div>
+            <p class="exp-desc">${company.learned || "N/A"}</p>
+          </li>
+        </ul>
+      `;
+    }
+
+    function updateCompaniesTimers() {
+      if (!companiesList || !companiesPanel || !companiesPanel.classList.contains("open")) return;
+      getWorkedCompanies().forEach((company, idx) => {
+        if (!company.startDate) return;
+        const el = document.getElementById(`companyTime${idx}`);
+        if (!el) return;
+        el.textContent = company.endDate
+          ? formatElapsedBetween(company.startDate, company.endDate)
+          : formatElapsedSince(company.startDate);
+      });
+      const selected = getWorkedCompanies()[selectedCompanyIdx];
+      if (
+        selected &&
+        !selected.endDate &&
+        companiesDetail &&
+        !companiesDetail.classList.contains("hidden")
+      ) {
+        renderCompanyDetails(selectedCompanyIdx);
+      }
+    }
+
+    function openCompaniesPanel() {
+      if (dossier.classList.contains("open")) closeDossier();
+      selectedCompanyIdx = 0;
+      renderCompaniesList();
+      if (companiesDetail) {
+        companiesDetail.classList.add("hidden");
+        companiesDetail.innerHTML = "";
+      }
+      overlay.classList.add("open");
+      companiesPanel.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      companiesPanel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      updateCompaniesTimers();
+      closeCompaniesBtn.focus();
+    }
+
+    function closeCompaniesPanel() {
+      companiesPanel.classList.remove("open");
+      companiesPanel.setAttribute("aria-hidden", "true");
+      if (!dossier.classList.contains("open")) {
+        overlay.classList.remove("open");
+        overlay.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+    }
+
+    function openLoadingPanel() {
+      if (!loadingPanel) return;
+      closeDossier();
+      closeCompaniesPanel();
+      if (thanksPanel) {
+        thanksPanel.classList.remove("open");
+        thanksPanel.setAttribute("aria-hidden", "true");
+      }
+      loadingPanel.classList.add("open");
+      loadingPanel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      clearTimeout(loadingTimer);
+      loadingTimer = setTimeout(() => {
+        loadingPanel.classList.remove("open");
+        loadingPanel.setAttribute("aria-hidden", "true");
+        if (thanksPanel) {
+          thanksPanel.classList.add("open");
+          thanksPanel.setAttribute("aria-hidden", "false");
+          if (closeThanksBtn) closeThanksBtn.focus();
+        } else {
+          document.body.style.overflow = "";
+        }
+      }, 2500);
+    }
+
+    function closeThanksPanel() {
+      if (!thanksPanel) return;
+      thanksPanel.classList.remove("open");
+      thanksPanel.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function formatElapsedSince(startDate) {
+      const now = new Date();
+      const cursor = new Date(startDate);
+
+      let years = 0;
+      let months = 0;
+
+      while (true) {
+        const next = new Date(cursor);
+        next.setFullYear(next.getFullYear() + 1);
+        if (next <= now) {
+          years += 1;
+          cursor.setFullYear(cursor.getFullYear() + 1);
+        } else {
+          break;
+        }
+      }
+
+      while (true) {
+        const next = new Date(cursor);
+        next.setMonth(next.getMonth() + 1);
+        if (next <= now) {
+          months += 1;
+          cursor.setMonth(cursor.getMonth() + 1);
+        } else {
+          break;
+        }
+      }
+
+      const diffMs = now - cursor;
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return `${years}a ${months}m ${days}d ${hours}h ${minutes}min ${seconds}s`;
+    }
+
+    function formatElapsedBetween(startDate, endDate) {
+      const now = new Date(endDate);
+      const cursor = new Date(startDate);
+
+      let years = 0;
+      let months = 0;
+
+      while (true) {
+        const next = new Date(cursor);
+        next.setFullYear(next.getFullYear() + 1);
+        if (next <= now) {
+          years += 1;
+          cursor.setFullYear(cursor.getFullYear() + 1);
+        } else {
+          break;
+        }
+      }
+
+      while (true) {
+        const next = new Date(cursor);
+        next.setMonth(next.getMonth() + 1);
+        if (next <= now) {
+          months += 1;
+          cursor.setMonth(cursor.getMonth() + 1);
+        } else {
+          break;
+        }
+      }
+
+      const diffMs = now - cursor;
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return `${years}a ${months}m ${days}d ${hours}h ${minutes}min ${seconds}s`;
+    }
+
+    function updateDossierTicker() {
+      if (!dossierTimeMode) return;
+      const isLife = dossierTimeMode === "life";
+      const start = isLife ? lifeStartDate : experienceStartDate;
+      const label = isLife ? "TEMPO DE VIDA" : "TEMPO DE EXPERIÊNCIA";
+      const elapsed = formatElapsedSince(start);
+      dossierId.textContent = `${label} // ${elapsed}`;
+      if (document.body.classList.contains("dossier-op-hud-active") && taoaHudTime) {
+        taoaHudTime.textContent = `${label} // ${elapsed}`;
+      }
+    }
+
+    function openDossier(index) {
+      const op = operators[index];
+      if (!op) return;
+      hideBriefingPanel();
+      setSelectedOperator(index);
+      document.body.classList.add("dossier-open");
+      document.body.classList.add("dossier-op-hud-active");
+      if (taoaHud) taoaHud.setAttribute("aria-hidden", "false");
+      if (opHudName) opHudName.textContent = op.codename.toUpperCase();
+      if (opHudRole) opHudRole.textContent = op.role;
+
+      dossierTimeMode = op.id === "OP-01" ? "life" : "experience";
+      updateDossierTicker();
+      dossierTitle.textContent = op.codename;
+      dossierRole.textContent = op.role;
+
+      const dadosHtml =
+        op.id === "OP-01"
+          ? `
+        <section class="block dados-block" aria-label="Dados">
+          <h3 class="block-title">Dados</h3>
+          <ul class="exp-list">
+            ${op.dados
+              .map(
+                (d) => `
+              <li class="exp-item">
+                <div class="exp-org">${d.label}</div>
+                <p class="exp-desc">${d.value}</p>
+              </li>
+            `
+              )
+              .join("")}
+          </ul>
+        </section>`
+          : "";
+
+      const idiomasHtml =
+        op.id === "OP-01"
+          ? `
+        <section class="block" aria-label="Idiomas">
+          <h3 class="block-title">Idiomas</h3>
+          <div class="tags">
+            ${op.idiomas.map((lang) => `<span class="tag">${lang}</span>`).join("")}
+          </div>
+        </section>`
+          : "";
+
+      const certificatesHtml =
+        op.id === "OP-02" && Array.isArray(op.certificates) && op.certificates.length > 0
+          ? `
+        <section class="block" aria-label="Certificados">
+          <h3 class="block-title">Certificados</h3>
+          <ul class="exp-list">
+            ${op.certificates
+              .map(
+                (cert) => `
+              <li class="exp-item">
+                <p class="exp-desc">${cert}</p>
+              </li>
+            `
+              )
+              .join("")}
+          </ul>
+        </section>`
+          : "";
+
+      dossierBody.innerHTML = `
+        ${dadosHtml}
+        <section class="block" aria-label="Detalhes">
+          <h3 class="block-title">Detalhes</h3>
+          <ul class="exp-list">
+            ${op.details
+              .map(
+                (detail) => `
+              <li class="exp-item">
+                <p class="exp-desc">${detail}</p>
+              </li>
+            `
+              )
+              .join("")}
+          </ul>
+        </section>
+        <section class="block" aria-label="Experiências">
+          <h3 class="block-title">Experiências</h3>
+          <ul class="exp-list">
+            ${op.experiences
+              .map(
+                (e) => `
+              <li class="exp-item">
+                <div class="exp-org">${e.org}</div>
+                <div class="exp-meta">${e.period}</div>
+                <p class="exp-desc">${e.desc}</p>
+              </li>
+            `
+              )
+              .join("")}
+          </ul>
+        </section>
+        ${certificatesHtml}
+        <section class="block" aria-label="Habilidades">
+          <h3 class="block-title">Habilidades</h3>
+          <div class="tags">
+            ${op.skills.map((s) => `<span class="tag highlight">${s}</span>`).join("")}
+          </div>
+        </section>
+        ${idiomasHtml}
+        <section class="block" aria-label="${op.toolsSectionTitle || "Ferramentas"}">
+          <h3 class="block-title">${op.toolsSectionTitle || "Ferramentas"}</h3>
+          <div class="tags">
+            ${op.tools.map((t) => `<span class="tag">${t}</span>`).join("")}
+          </div>
+        </section>
+      `;
+
+      overlay.classList.add("open");
+      dossier.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      dossier.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      clearInterval(experienceTimer);
+      experienceTimer = setInterval(updateDossierTicker, 1000);
+      closeBtn.focus();
+    }
+
+    function closeDossier() {
+      hideBriefingPanel();
+      overlay.classList.remove("open");
+      dossier.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      dossier.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      clearInterval(experienceTimer);
+      experienceTimer = null;
+      dossierTimeMode = null;
+      setSelectedOperator(null);
+      document.body.classList.remove("dossier-open");
+      document.body.classList.remove("dossier-op-hud-active");
+      if (taoaHud) taoaHud.setAttribute("aria-hidden", "true");
+    }
+
+    overlay.addEventListener("click", closeDossier);
+    closeBtn.addEventListener("click", closeDossier);
+    if (companiesTrigger) companiesTrigger.addEventListener("click", openCompaniesPanel);
+    if (closeCompaniesBtn) closeCompaniesBtn.addEventListener("click", closeCompaniesPanel);
+    if (deployFab) deployFab.addEventListener("click", openLoadingPanel);
+    if (closeThanksBtn) closeThanksBtn.addEventListener("click", closeThanksPanel);
+    overlay.addEventListener("click", closeCompaniesPanel);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeDossier();
+        closeCompaniesPanel();
+        closeThanksPanel();
+      }
+    });
+
+    function tickClock() {
+      const el = document.getElementById("clock");
+      const pad = (n) => String(n).padStart(2, "0");
+      const d = new Date();
+      const syncText = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      el.textContent = `SYNC — ${syncText}`;
+      updateBriefingTime();
+      updateCompaniesTimers();
+    }
+
+    function initLobbyOperatorPicks() {
+      const picks = document.querySelectorAll(".lobby-pick");
+      picks.forEach((btn) => {
+        const i = Number(btn.dataset.opIndex);
+        const op = operators[i];
+        const img = btn.querySelector(".lobby-pick-img");
+        const nicknameEl = btn.querySelector(".op-nickname");
+        if (!op || !op.portrait || !img) {
+          btn.hidden = true;
+          return;
+        }
+        btn.hidden = false;
+        img.src = op.portrait;
+        img.alt = `Retrato do operador ${op.codename}`;
+        if (nicknameEl) nicknameEl.textContent = op.codename;
+        btn.setAttribute("aria-label", `Abrir dossier: ${op.codename}`);
+        btn.addEventListener("mouseenter", () => showBriefingForOperator(i));
+        btn.addEventListener("mouseleave", hideBriefingPanel);
+        btn.addEventListener("focus", () => showBriefingForOperator(i));
+        btn.addEventListener("blur", hideBriefingPanel);
+        btn.addEventListener("click", () => openDossier(i));
+      });
+    }
+
+    function showBriefingForOperator(index) {
+      setSelectedOperator(index);
+      if (briefingPanel) briefingPanel.classList.add("is-visible");
+    }
+
+    function hideBriefingPanel() {
+      if (briefingPanel) briefingPanel.classList.remove("is-visible");
+    }
+
+    function setSelectedOperator(index) {
+      document.querySelectorAll(".lobby-pick").forEach((btn) => {
+        btn.classList.toggle("is-selected", Number(btn.dataset.opIndex) === index);
+      });
+      const op = index === null ? operators[0] : operators[index];
+      if (!op) return;
+      activeBriefingOperatorId = op.id;
+      if (briefingPanel) {
+        briefingPanel.classList.toggle("is-right", op.id === "OP-02");
+      }
+      if (briefingOperator) briefingOperator.textContent = op.codename.toUpperCase();
+      if (briefingRole) briefingRole.textContent = op.id === "OP-01" ? "Pessoal" : "Profissional - Júnior";
+      if (briefingStatus) briefingStatus.textContent = "DISPONÍVEL";
+      if (briefingSpecialty) {
+        const listedSkills = Array.isArray(op.skills) ? op.skills.filter(Boolean) : [];
+        if (listedSkills.length === 0) {
+          briefingSpecialty.textContent = "N/A";
+        } else if (listedSkills.length === 1) {
+          briefingSpecialty.textContent = listedSkills[0];
+          lastBriefingSkillByOp[op.id] = listedSkills[0];
+        } else {
+          const lastSkill = lastBriefingSkillByOp[op.id];
+          const pool = listedSkills.filter((s) => s !== lastSkill);
+          const nextSkill = pool[Math.floor(Math.random() * pool.length)];
+          briefingSpecialty.textContent = nextSkill;
+          lastBriefingSkillByOp[op.id] = nextSkill;
+        }
+      }
+      if (briefingInterests) {
+        const listedInterests = Array.isArray(op.tools) ? op.tools.filter(Boolean) : [];
+        if (listedInterests.length === 0) {
+          briefingInterests.textContent = "N/A";
+        } else if (listedInterests.length === 1) {
+          briefingInterests.textContent = listedInterests[0];
+          lastBriefingInterestByOp[op.id] = listedInterests[0];
+        } else {
+          const lastInterest = lastBriefingInterestByOp[op.id];
+          const pool = listedInterests.filter((i) => i !== lastInterest);
+          const nextInterest = pool[Math.floor(Math.random() * pool.length)];
+          briefingInterests.textContent = nextInterest;
+          lastBriefingInterestByOp[op.id] = nextInterest;
+        }
+      }
+      updateBriefingTime();
+    }
+
+    function updateBriefingTime() {
+      if (!briefingTime) return;
+      const isLife = activeBriefingOperatorId === "OP-01";
+      const start = isLife ? lifeStartDate : experienceStartDate;
+      briefingTime.textContent = formatElapsedSince(start);
+    }
+
+    setSelectedOperator(0);
+    tickClock();
+    setInterval(tickClock, 1000);
+    initLobbyOperatorPicks();
+  </script>
+</body>
+</html>
+
