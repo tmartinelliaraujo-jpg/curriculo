@@ -1121,14 +1121,207 @@
       }
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 768px) {
+      .app {
+        padding: 10px;
+      }
+
       .top-bar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
       }
+
+      .brand {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .brand-mark {
+        letter-spacing: 0.18em;
+      }
+
       .status-row {
         width: 100%;
         justify-content: flex-start;
+      }
+
+      .section-head {
+        margin-top: 16px;
+      }
+
+      .section-head h1 {
+        font-size: clamp(1.15rem, 6vw, 1.55rem);
+      }
+
+      .briefing-panel {
+        width: min(84vw, 300px);
+        left: 8px;
+        top: 62%;
+      }
+
+      .briefing-panel.is-right {
+        right: 8px;
+      }
+
+      .lobby-operators {
+        left: 50%;
+        top: 64%;
+        width: 100%;
+        height: min(62vh, 540px);
+        gap: 2px;
+        padding: 0 6px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .lobby-pick {
+        padding: 0;
+        width: min(88vw, 380px);
+        max-width: min(88vw, 380px);
+        flex: 0 0 min(30vh, 240px);
+        height: min(30vh, 240px);
+      }
+
+      .op-nickname {
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+      }
+
+      .deploy-fab {
+        right: 10px;
+        left: 10px;
+        bottom: 12px;
+        min-width: 0;
+        width: auto;
+        padding: 8px 12px;
+      }
+
+      .taoa-hud {
+        left: 50%;
+        top: 16%;
+        transform: translateX(-50%);
+        min-width: 0;
+        width: min(92vw, 420px);
+      }
+
+      .taoa-hud-name {
+        font-size: clamp(1.1rem, 5.2vw, 1.55rem);
+      }
+
+      .taoa-hud-role {
+        font-size: 0.94rem;
+      }
+
+      .dossier-open .lobby-operators {
+        left: 50%;
+        top: 62%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+      }
+
+      .dossier-open .lobby-pick {
+        flex: 0 0 min(32vh, 250px);
+        width: min(88vw, 380px);
+        max-width: min(88vw, 380px);
+      }
+
+      .dossier {
+        width: 100%;
+        border-left: none;
+        box-shadow: none;
+      }
+
+      .dossier-header {
+        padding: 14px 14px 12px;
+      }
+
+      .dossier-name {
+        font-size: clamp(1.2rem, 5.8vw, 1.5rem);
+      }
+
+      .dossier-body {
+        padding: 12px 14px 20px;
+      }
+
+      .companies-panel {
+        width: min(96vw, 560px);
+        max-height: min(86vh, 700px);
+      }
+
+      .companies-header,
+      .companies-body {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .thanks-box,
+      .loading-box {
+        width: 94vw;
+        padding: 14px 12px 12px;
+      }
+
+      .thanks-contacts {
+        font-size: 0.68rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .brand-title {
+        letter-spacing: 0.08em;
+      }
+
+      .section-head {
+        margin-bottom: 6px;
+      }
+
+      .section-head h1::after {
+        width: 52px;
+      }
+
+      .briefing-panel {
+        width: min(90vw, 300px);
+        min-height: 198px;
+        top: 64%;
+        padding: 10px;
+      }
+
+      .briefing-line {
+        margin-top: 8px;
+      }
+
+      .lobby-operators {
+        top: 66%;
+        height: min(58vh, 460px);
+      }
+
+      .dossier-open .lobby-operators {
+        top: 64%;
+      }
+
+      .dossier-exit-btn,
+      .close-btn {
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        padding: 6px 8px;
+      }
+
+      .companies-item {
+        gap: 8px;
+        padding: 8px 10px;
+        font-size: 0.62rem;
+      }
+
+      .companies-item-time {
+        font-size: 0.52rem;
+      }
+
+      .bottom-bar {
+        padding-top: 14px;
+        font-size: 0.6rem;
       }
     }
   </style>
