@@ -210,12 +210,23 @@
       outline-offset: 3px;
     }
 
-    .section-head-duo {
+    .section-head-top {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .section-head-top .section-head-duo-title {
       min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .section-head-actions {
+      display: flex;
+      justify-content: flex-start;
     }
 
     .lobby-curriculum-btn {
@@ -229,15 +240,14 @@
       letter-spacing: 0.16em;
     }
 
-    /* Main title */
+    /* Main title — Duo e Empresas na mesma linha (base alinhada); Currículo abaixo */
     .section-head {
       margin-top: clamp(20px, 4vw, 40px);
       margin-bottom: 8px;
       display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
     }
 
     .section-head h1 {
@@ -2061,15 +2071,19 @@
     </header>
 
     <div class="section-head">
-      <div class="section-head-duo">
-        <h1>Duo</h1>
+      <div class="section-head-top">
+        <div class="section-head-duo-title">
+          <h1>Duo</h1>
+        </div>
+        <button type="button" class="duo-right companies-trigger">
+          <h1>Empresas</h1>
+        </button>
+      </div>
+      <div class="section-head-actions">
         <button type="button" class="tag-ready lobby-curriculum-btn" id="lobbyCurriculumBtn" aria-label="Abrir currículo">
           Currículo
         </button>
       </div>
-      <button type="button" class="duo-right companies-trigger">
-        <h1>Empresas</h1>
-      </button>
     </div>
 
     <div class="lobby-spacer" aria-hidden="true"></div>
