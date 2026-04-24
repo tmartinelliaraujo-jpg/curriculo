@@ -1598,6 +1598,7 @@
     let dossierTimeMode = null;
     let loadingTimer = null;
     let selectedCompanyIdx = 0;
+    let handlingPopState = false;
     const companiesAndRoles = [
       {
         name: "Zello Tecnologia",
@@ -1713,11 +1714,16 @@
       overlay.setAttribute("aria-hidden", "false");
       companiesPanel.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      history.pushState({ appModal: "companies" }, "", window.location.href);
       updateCompaniesTimers();
       closeCompaniesBtn.focus();
     }
 
-    function closeCompaniesPanel() {
+    function closeCompaniesPanel(options = {}) {
+      if (!options.skipHistory && !handlingPopState && history.state && history.state.appModal) {
+        history.back();
+        return;
+      }
       companiesPanel.classList.remove("open");
       companiesPanel.setAttribute("aria-hidden", "true");
       if (!dossier.classList.contains("open")) {
@@ -1729,8 +1735,8 @@
 
     function openLoadingPanel() {
       if (!loadingPanel) return;
-      closeDossier();
-      closeCompaniesPanel();
+      closeDossier({ skipHistory: true });
+      closeCompaniesPanel({ skipHistory: true });
       if (thanksPanel) {
         thanksPanel.classList.remove("open");
         thanksPanel.setAttribute("aria-hidden", "true");
@@ -1738,6 +1744,7 @@
       loadingPanel.classList.add("open");
       loadingPanel.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      history.pushState({ appModal: "loading" }, "", window.location.href);
       clearTimeout(loadingTimer);
       loadingTimer = setTimeout(() => {
         loadingPanel.classList.remove("open");
@@ -1745,6 +1752,7 @@
         if (thanksPanel) {
           thanksPanel.classList.add("open");
           thanksPanel.setAttribute("aria-hidden", "false");
+          history.replaceState({ appModal: "thanks" }, "", window.location.href);
           if (closeThanksBtn) closeThanksBtn.focus();
         } else {
           document.body.style.overflow = "";
@@ -1752,10 +1760,27 @@
       }, 2500);
     }
 
-    function closeThanksPanel() {
+    function closeThanksPanel(options = {}) {
       if (!thanksPanel) return;
+      if (!options.skipHistory && !handlingPopState && history.state && history.state.appModal) {
+        history.back();
+        return;
+      }
       thanksPanel.classList.remove("open");
       thanksPanel.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function closeLoadingPanel(options = {}) {
+      if (!loadingPanel) return;
+      if (!options.skipHistory && !handlingPopState && history.state && history.state.appModal) {
+        history.back();
+        return;
+      }
+      clearTimeout(loadingTimer);
+      loadingTimer = null;
+      loadingPanel.classList.remove("open");
+      loadingPanel.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
     }
 
@@ -1968,12 +1993,17 @@
       overlay.setAttribute("aria-hidden", "false");
       dossier.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      history.pushState({ appModal: "dossier" }, "", window.location.href);
       clearInterval(experienceTimer);
       experienceTimer = setInterval(updateDossierTicker, 1000);
       closeBtn.focus();
     }
 
-    function closeDossier() {
+    function closeDossier(options = {}) {
+      if (!options.skipHistory && !handlingPopState && history.state && history.state.appModal) {
+        history.back();
+        return;
+      }
       hideBriefingPanel();
       overlay.classList.remove("open");
       dossier.classList.remove("open");
@@ -1999,10 +2029,34 @@
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        closeDossier();
-        closeCompaniesPanel();
-        closeThanksPanel();
+        if (thanksPanel && thanksPanel.classList.contains("open")) {
+          closeThanksPanel();
+          return;
+        }
+        if (loadingPanel && loadingPanel.classList.contains("open")) {
+          closeLoadingPanel();
+          return;
+        }
+        if (companiesPanel && companiesPanel.classList.contains("open")) {
+          closeCompaniesPanel();
+          return;
+        }
+        if (dossier.classList.contains("open")) closeDossier();
       }
+    });
+
+    window.addEventListener("popstate", () => {
+      handlingPopState = true;
+      if (thanksPanel && thanksPanel.classList.contains("open")) {
+        closeThanksPanel({ skipHistory: true });
+      } else if (loadingPanel && loadingPanel.classList.contains("open")) {
+        closeLoadingPanel({ skipHistory: true });
+      } else if (companiesPanel && companiesPanel.classList.contains("open")) {
+        closeCompaniesPanel({ skipHistory: true });
+      } else if (dossier.classList.contains("open")) {
+        closeDossier({ skipHistory: true });
+      }
+      handlingPopState = false;
     });
 
     function tickClock() {
