@@ -6,7 +6,7 @@
   <title>LOBBY — Seleção de Perfil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-deep: #050608;
@@ -199,13 +199,34 @@
       letter-spacing: 0.16em;
     }
 
-    .deploy-fab:hover {
+    .deploy-fab:hover,
+    .lobby-curriculum-btn:hover {
       filter: brightness(1.08);
     }
 
-    .deploy-fab:focus-visible {
+    .deploy-fab:focus-visible,
+    .lobby-curriculum-btn:focus-visible {
       outline: 2px solid var(--orange);
       outline-offset: 3px;
+    }
+
+    .section-head-duo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .lobby-curriculum-btn {
+      cursor: pointer;
+      border: none;
+      margin: 0;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      padding: 8px 28px;
+      width: fit-content;
+      max-width: min(92vw, 320px);
+      letter-spacing: 0.16em;
     }
 
     /* Main title */
@@ -878,12 +899,24 @@
       z-index: 54;
       display: none;
       place-items: center;
-      background: rgba(0, 0, 0, 0.92);
+      /* Fundo opaco: antes era rgba(0,0,0,0.92) e deixava a vinheta do lobby vazar nas bordas (efeito “túnel”). */
+      background: #ebe4dc;
       padding: 12px;
     }
 
     .resume-panel.open {
       display: grid;
+    }
+
+    body:has(.resume-panel.open) .vignette,
+    body:has(.resume-panel.open) .scanlines {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    body:has(.resume-panel.open)::before {
+      opacity: 0;
+      transition: opacity 0.25s ease;
     }
 
     .resume-panel:focus {
@@ -893,9 +926,9 @@
     .resume-panel .resume-box {
       display: flex;
       flex-direction: column;
-      background-color: #f2f2f0;
+      background-color: #fdf8f3;
       background-image: none;
-      border: 1px solid #b8b8b8;
+      border: 1px solid #c9b8a8;
       color: #111;
       scrollbar-width: thin;
       scrollbar-color: rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.07);
@@ -907,6 +940,185 @@
     .resume-panel .resume-grid {
       flex: 1 1 auto;
       min-height: 0;
+      display: block;
+    }
+
+    .cv-sheet {
+      font-family: "Inter", system-ui, sans-serif;
+      color: #1a1a1a;
+      background: #fdf8f3;
+      padding: 6px 8px 22px;
+      border-radius: 2px;
+    }
+
+    .cv-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1.14fr) minmax(0, 0.86fr);
+      gap: 22px 28px;
+      align-items: start;
+    }
+
+    .cv-section {
+      margin-bottom: 22px;
+    }
+
+    .cv-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .cv-h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #2a2420;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(44, 36, 32, 0.18);
+    }
+
+    .cv-h3 {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0.04em;
+      color: #3d342c;
+      margin: 14px 0 8px;
+    }
+
+    .cv-h3:first-child {
+      margin-top: 0;
+    }
+
+    .cv-dados {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .cv-dados-li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .cv-dados-ic {
+      flex: 0 0 auto;
+      color: #6b5344;
+      margin-top: 2px;
+    }
+
+    .cv-ic {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .cv-dados-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .cv-about {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: #2a2420;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .cv-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cv-pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #eedcc8;
+      border: 1px solid #b89a7e;
+      color: #1a1a1a;
+      letter-spacing: 0.02em;
+    }
+
+    .cv-list-plain {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .cv-list-plain li {
+      padding-left: 0;
+    }
+
+    .cv-certs {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #2a2420;
+    }
+
+    .cv-exp-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+
+    .cv-exp-head strong {
+      font-weight: 700;
+    }
+
+    .cv-exp-role {
+      font-weight: 600;
+      font-size: 0.84rem;
+      margin-bottom: 8px;
+      color: #2a2420;
+    }
+
+    .cv-exp-list {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #2a2420;
+    }
+
+    .cv-exp-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .cv-exp-list li::before {
+      content: "";
+      flex: 0 0 6px;
+      width: 6px;
+      height: 6px;
+      margin-top: 0.42em;
+      border-radius: 50%;
+      background: #6b5344;
+    }
+
+    .cv-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-style: italic;
+      color: #4a4038;
     }
 
     .resume-panel .resume-box::-webkit-scrollbar {
@@ -923,6 +1135,48 @@
       border-radius: 6px;
       border: 2px solid transparent;
       background-clip: padding-box;
+    }
+
+    .resume-panel .resume-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .resume-panel .resume-toolbar .resume-title {
+      margin-bottom: 0;
+      flex: 1 1 auto;
+      min-width: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      letter-spacing: 0.18em;
+    }
+
+    .resume-panel .resume-print-btn {
+      flex: 0 0 auto;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid #1a1a1a;
+      background: #fff;
+      color: #1a1a1a;
+      border-radius: 2px;
+    }
+
+    .resume-panel .resume-print-btn:hover {
+      background: #1a1a1a;
+      color: #f9f7f2;
+    }
+
+    .resume-panel .resume-print-btn:focus-visible {
+      outline: 2px solid #e8943a;
+      outline-offset: 2px;
     }
 
     .resume-panel .resume-title {
@@ -966,7 +1220,7 @@
     }
 
     .resume-box {
-      width: min(900px, 96vw);
+      width: min(940px, 96vw);
       max-height: 92vh;
       overflow: auto;
       border: 1px solid var(--border-dim);
@@ -984,9 +1238,7 @@
     }
 
     .resume-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      display: block;
     }
 
     .resume-tools-lang-stack {
@@ -1112,8 +1364,8 @@
         max-height: none !important;
         min-height: 289mm !important;
         overflow: visible !important;
-        border: 1px solid #b8b8b8 !important;
-        background-color: #f2f2f0 !important;
+        border: 1px solid #c9b8a8 !important;
+        background-color: #fdf8f3 !important;
         background-image: none !important;
         color: #111 !important;
         box-shadow: none !important;
@@ -1121,6 +1373,17 @@
         text-shadow: none !important;
         padding: 4.5mm !important;
         transform: none !important;
+      }
+
+      body.printing-resume .resume-toolbar,
+      body.printing-a4-only #a4ResumePrintRoot .resume-toolbar {
+        display: block !important;
+        margin-bottom: 2.8mm !important;
+      }
+
+      body.printing-resume .resume-print-btn,
+      body.printing-a4-only #a4ResumePrintRoot .resume-print-btn {
+        display: none !important;
       }
 
       body.printing-resume .resume-title,
@@ -1135,11 +1398,80 @@
 
       body.printing-resume .resume-grid,
       body.printing-a4-only #a4ResumePrintRoot .resume-grid {
+        display: block !important;
         flex: 1 1 auto !important;
         min-height: 0 !important;
-        align-content: start !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 2.8mm !important;
+      }
+
+      body.printing-resume .cv-columns,
+      body.printing-a4-only #a4ResumePrintRoot .cv-columns {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr) !important;
+        gap: 3mm 3.5mm !important;
+        align-items: start !important;
+      }
+
+      body.printing-resume .cv-sheet,
+      body.printing-a4-only #a4ResumePrintRoot .cv-sheet {
+        background: #fdf8f3 !important;
+        font-family: "Inter", system-ui, sans-serif !important;
+        padding: 0 !important;
+      }
+
+      body.printing-resume .cv-h2,
+      body.printing-a4-only #a4ResumePrintRoot .cv-h2 {
+        font-size: 9.5pt !important;
+        letter-spacing: 0.12em !important;
+        color: #2a2420 !important;
+        border-bottom: 1px solid rgba(44, 36, 32, 0.18) !important;
+      }
+
+      body.printing-resume .cv-h3,
+      body.printing-a4-only #a4ResumePrintRoot .cv-h3 {
+        font-size: 8.5pt !important;
+        color: #3d342c !important;
+      }
+
+      body.printing-resume .cv-about,
+      body.printing-a4-only #a4ResumePrintRoot .cv-about {
+        font-size: 9.5pt !important;
+        line-height: 1.45 !important;
+        color: #2a2420 !important;
+      }
+
+      body.printing-resume .cv-dados-li,
+      body.printing-a4-only #a4ResumePrintRoot .cv-dados-li {
+        font-size: 9.5pt !important;
+      }
+
+      body.printing-resume .cv-pill,
+      body.printing-a4-only #a4ResumePrintRoot .cv-pill {
+        font-size: 8.5pt !important;
+        padding: 0.55mm 1.8mm !important;
+        background: #eedcc8 !important;
+        border: 1px solid #b89a7e !important;
+        color: #1a1a1a !important;
+      }
+
+      body.printing-resume .cv-certs li,
+      body.printing-a4-only #a4ResumePrintRoot .cv-certs li,
+      body.printing-resume .cv-list-plain li,
+      body.printing-a4-only #a4ResumePrintRoot .cv-list-plain li {
+        font-size: 9pt !important;
+        color: #2a2420 !important;
+      }
+
+      body.printing-resume .cv-exp-list li,
+      body.printing-a4-only #a4ResumePrintRoot .cv-exp-list li {
+        display: flex !important;
+        font-size: 9pt !important;
+        color: #2a2420 !important;
+      }
+
+      body.printing-resume .cv-footer,
+      body.printing-a4-only #a4ResumePrintRoot .cv-footer {
+        font-size: 9pt !important;
+        color: #4a4038 !important;
       }
 
       body.printing-resume .resume-tools-lang-stack,
@@ -1562,6 +1894,11 @@
         padding: 8px 12px;
       }
 
+      .lobby-curriculum-btn {
+        padding: 8px 14px;
+        max-width: 100%;
+      }
+
       .taoa-hud {
         left: 50%;
         top: 16%;
@@ -1638,6 +1975,11 @@
 
       .resume-grid {
         grid-template-columns: 1fr;
+      }
+
+      .cv-columns {
+        grid-template-columns: 1fr;
+        gap: 18px;
       }
     }
 
@@ -1719,7 +2061,12 @@
     </header>
 
     <div class="section-head">
-      <h1>Duo</h1>
+      <div class="section-head-duo">
+        <h1>Duo</h1>
+        <button type="button" class="tag-ready lobby-curriculum-btn" id="lobbyCurriculumBtn" aria-label="Abrir currículo">
+          Currículo
+        </button>
+      </div>
       <button type="button" class="duo-right companies-trigger">
         <h1>Empresas</h1>
       </button>
@@ -1809,13 +2156,18 @@
         <div>Linkedin -</div>
         <div>Fiverr -</div>
       </div>
-      <button type="button" class="close-btn thanks-close" id="closeThanksBtn">Fechar [ ESC ]</button>
+      <button type="button" class="close-btn thanks-close" id="closeThanksBtn">Currículo</button>
     </div>
   </section>
 
   <section class="resume-panel" id="resumePanel" aria-hidden="true" tabindex="-1">
     <div class="resume-box" id="resumeSourceBox">
-      <div class="resume-title">Currículo</div>
+      <div class="resume-toolbar">
+        <div class="resume-title">CURRÍCULO</div>
+        <button type="button" class="resume-print-btn" id="resumePrintBtn" aria-label="Imprimir currículo (atalho Control+P)">
+          Imprimir currículo
+        </button>
+      </div>
       <div class="resume-grid" id="resumeGrid"></div>
     </div>
   </section>
@@ -1959,8 +2311,10 @@
     const loadingPanel = document.getElementById("loadingPanel");
     const thanksPanel = document.getElementById("thanksPanel");
     const closeThanksBtn = document.getElementById("closeThanksBtn");
+    const lobbyCurriculumBtn = document.getElementById("lobbyCurriculumBtn");
     const resumePanel = document.getElementById("resumePanel");
     const resumeGrid = document.getElementById("resumeGrid");
+    const resumePrintBtn = document.getElementById("resumePrintBtn");
     const briefingOperator = document.getElementById("briefingOperator");
     const briefingRole = document.getElementById("briefingRole");
     const briefingStatus = document.getElementById("briefingStatus");
@@ -1981,6 +2335,16 @@
     let experienceTimer = null;
     let dossierTimeMode = null;
     let loadingTimer = null;
+    const LOADING_DEFAULT_TITLE = "Deploy";
+    const LOADING_DEFAULT_TEXT = "Processando aprovação do perfil...";
+
+    function restoreLoadingPanelCopy() {
+      if (!loadingPanel) return;
+      const titleEl = loadingPanel.querySelector(".loading-title");
+      const textEl = loadingPanel.querySelector(".loading-text");
+      if (titleEl) titleEl.textContent = LOADING_DEFAULT_TITLE;
+      if (textEl) textEl.textContent = LOADING_DEFAULT_TEXT;
+    }
     let selectedCompanyIdx = 0;
     let handlingPopState = false;
     const companiesAndRoles = [
@@ -2167,6 +2531,7 @@
       }
       clearTimeout(loadingTimer);
       loadingTimer = null;
+      restoreLoadingPanelCopy();
       loadingPanel.classList.remove("open");
       loadingPanel.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
@@ -2178,125 +2543,176 @@
 
     function renderResumePanel() {
       if (!resumeGrid) return;
-      const martinelli = getOperatorById("OP-01");
-      const taoa = getOperatorById("OP-02");
+
       const companies = getWorkedCompanies();
+      const job = companies[0];
 
-      const dadosMartinelli = (martinelli?.dados || [])
-        .map((d) => `<li><strong>${d.label}:</strong> ${d.value}</li>`)
-        .join("");
+      const iUser =
+        '<svg class="cv-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+      const iCal =
+        '<svg class="cv-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      const iPhone =
+        '<svg class="cv-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+      const iMail =
+        '<svg class="cv-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+      const iPin =
+        '<svg class="cv-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 
-      const habilidadesMartinelli = (martinelli?.skills || [])
-        .map((s) => `<span class="tag">${s}</span>`)
-        .join("");
-      const habilidadesTaoa = (taoa?.skills || [])
-        .map((s) => `<span class="tag">${s}</span>`)
-        .join("");
+      const pills = (arr) => arr.map((t) => `<span class="cv-pill">${t}</span>`).join("");
 
-      const idiomas = (martinelli?.idiomas || [])
-        .map((lang) => `<span class="tag">${lang}</span>`)
-        .join("");
+      const langFw = [
+        "Python (Avançado)",
+        "JavaScript (Intermediário)",
+        "TypeScript (Intermediário)",
+        "React.js (Intermediário)",
+        "Node.js (Básico)",
+        "HTML5 (Intermediário)",
+        "CSS3 (Intermediário)"
+      ];
+      const conceitos = [
+        "REST APIs (Avançado)",
+        "Testes de Software (Intermediário)",
+        "Pensamento Analítico (Avançado)",
+        "Pensamento Lógico (Avançado)",
+        "Adaptabilidade",
+        "Autogestão",
+        "Proatividade",
+        "Liderança Empática",
+        "Comunicação",
+        "Gestão"
+      ];
 
-      const contatos = [
-        "Telefone - (61) 9.9663-3075",
-        "E-mail - tmartinelliaraujo@gmail.com",
-        "Instagram - _.autonelli._",
-        "TikTok - garagedonelli",
-        "Git - tmartinelliaraujo-jpg",
-        "Linkedin -",
-        "Fiverr -"
-      ]
-        .map((item) => `<li>${item}</li>`)
-        .join("");
+      const sobre =
+        "Desenvolvedor com foco em evolução contínua e apaixonado pela resolução de problemas através da tecnologia. Iniciou a trajetória na programação de forma autodidata, desenvolvendo automações e sistemas durante o ensino médio. Atualmente, busca aplicar meu pensamento analítico e proatividade em projetos desafiadores, priorizando o aprendizado prático e a entrega de código de qualidade. Possuo facilidade em liderança empática e trabalho colaborativo em equipe.";
 
-      const detalhesMartinelli = (martinelli?.details || [])
-        .map((item) => `<li>${item}</li>`)
-        .join("");
-      const detalhesTaoa = (taoa?.details || [])
-        .map((item) => `<li>${item}</li>`)
-        .join("");
-
-      const certificados = (taoa?.certificates || [])
-        .map((item) => `<li>${item}</li>`)
-        .join("");
-
-      const ferramentas = (taoa?.tools || [])
-        .map((item) => `<span class="tag">${item}</span>`)
-        .join("");
-
-      const empresas = companies
-        .map((company) => {
-          const tempo = company.startDate
-            ? company.endDate
-              ? formatElapsedBetween(company.startDate, company.endDate)
-              : formatElapsedSince(company.startDate)
-            : "N/A";
-          return `
-            <li>
-              <strong>${company.name}</strong><br />
-              Função: ${company.role || "N/A"}<br />
-              Tempo: ${tempo}<br />
-              Motivo de saída: ${company.reasonLeft || "N/A"}<br />
-              Aprendizado: ${company.learned || "N/A"}
-            </li>
-          `;
-        })
-        .join("");
+      const companyLine = job
+        ? `<div class="cv-exp-head"><strong>${job.name}</strong><span>| Atual</span></div>
+          <div class="cv-exp-role">${job.role || "Desenvolvedor Full Stack"}</div>
+          <ul class="cv-exp-list">
+            <li>Aprimoramento de automações</li>
+            <li>Colaboração com equipes multidisciplinares</li>
+            <li>Foco em entrega orientada à qualidade</li>
+          </ul>`
+        : `<p class="cv-about">Experiência profissional em atualização.</p>`;
 
       resumeGrid.innerHTML = `
-        <section class="resume-block">
-          <h4>Dados</h4>
-          <ul class="resume-simple-list">${dadosMartinelli || "<li>N/A</li>"}</ul>
-        </section>
+        <div class="cv-sheet">
+          <div class="cv-columns">
+            <div class="cv-col">
+              <section class="cv-section" aria-labelledby="cv-dados-heading">
+                <h2 class="cv-h2" id="cv-dados-heading">Dados pessoais</h2>
+                <ul class="cv-dados">
+                  <li class="cv-dados-li">
+                    <span class="cv-dados-ic">${iUser}</span>
+                    <span class="cv-dados-txt cv-dados-name">Taõ Augusta Martinelli de Araújo</span>
+                  </li>
+                  <li class="cv-dados-li">
+                    <span class="cv-dados-ic">${iCal}</span>
+                    <span class="cv-dados-txt">30 de março de 2007</span>
+                  </li>
+                  <li class="cv-dados-li">
+                    <span class="cv-dados-ic">${iPhone}</span>
+                    <span class="cv-dados-txt">(61) 9.9663-3075</span>
+                  </li>
+                  <li class="cv-dados-li">
+                    <span class="cv-dados-ic">${iMail}</span>
+                    <span class="cv-dados-txt">tmartinelliaraujo@gmail.com</span>
+                  </li>
+                  <li class="cv-dados-li">
+                    <span class="cv-dados-ic">${iPin}</span>
+                    <span class="cv-dados-txt">Cidade Ocidental - GO</span>
+                  </li>
+                </ul>
+              </section>
 
-        <section class="resume-block">
-          <h4>Contatos</h4>
-          <ul class="resume-simple-list">${contatos || "<li>N/A</li>"}</ul>
-        </section>
+              <section class="cv-section" aria-labelledby="cv-sobre-heading">
+                <h2 class="cv-h2" id="cv-sobre-heading">Sobre mim</h2>
+                <p class="cv-about">${sobre}</p>
+              </section>
 
-        <section class="resume-block">
-          <h4>Habilidades</h4>
-          <div class="tags">${habilidadesMartinelli}${habilidadesTaoa}</div>
-        </section>
+              <section class="cv-section" aria-labelledby="cv-hab-heading">
+                <h2 class="cv-h2" id="cv-hab-heading">Habilidades</h2>
+                <h3 class="cv-h3">Linguagens e frameworks</h3>
+                <div class="cv-pill-row">${pills(langFw)}</div>
+                <h3 class="cv-h3">Conceitos e outros</h3>
+                <div class="cv-pill-row">${pills(conceitos)}</div>
+              </section>
 
-        <div class="resume-tools-lang-stack">
-          <section class="resume-block">
-            <h4>Ferramentas</h4>
-            <div class="tags">${ferramentas || '<span class="tag">N/A</span>'}</div>
-          </section>
+              <section class="cv-section" aria-labelledby="cv-cert-heading">
+                <h2 class="cv-h2" id="cv-cert-heading">Certificados</h2>
+                <ul class="cv-certs">
+                  <li>Formação Python (I, II e III) — Curso em Vídeo (120h)</li>
+                  <li>Inteligência Artificial I — Curso em Vídeo (40h)</li>
+                  <li>Desenvolvimento Web (HTML5 e CSS3) — Curso em Vídeo (80h)</li>
+                  <li>Orquestração com Kubernetes — Udemy (17h)</li>
+                </ul>
+              </section>
+            </div>
 
-          <section class="resume-block">
-            <h4>Idiomas</h4>
-            <div class="tags">${idiomas || '<span class="tag">N/A</span>'}</div>
-          </section>
+            <div class="cv-col">
+              <section class="cv-section" aria-labelledby="cv-tools-heading">
+                <h2 class="cv-h2" id="cv-tools-heading">Ferramentas e tecnologias</h2>
+                <h3 class="cv-h3">IDEs &amp; contêineres</h3>
+                <div class="cv-pill-row">${pills(["VS Code", "Cursor", "Docker", "Kubernetes", "Git (GitHub/GitLab)"])}</div>
+                <h3 class="cv-h3">IA &amp; produtividade</h3>
+                <div class="cv-pill-row">${pills(["ChatGPT", "Claude", "Gemini", "n8n"])}</div>
+                <h3 class="cv-h3">DevOps &amp; integrações</h3>
+                <div class="cv-pill-row">${pills(["Mulesoft", "RPA", "Postman"])}</div>
+                <h3 class="cv-h3">Design &amp; multimídia</h3>
+                <div class="cv-pill-row">${pills(["Figma", "Edição de Vídeo", "Fotografia"])}</div>
+              </section>
+
+              <section class="cv-section" aria-labelledby="cv-lang-heading">
+                <h2 class="cv-h2" id="cv-lang-heading">Idiomas</h2>
+                <ul class="cv-list-plain">
+                  <li>Português (nativo)</li>
+                  <li>Inglês (intermediário)</li>
+                  <li>Espanhol (básico)</li>
+                </ul>
+              </section>
+
+              <section class="cv-section" aria-labelledby="cv-exp-heading">
+                <h2 class="cv-h2" id="cv-exp-heading">Experiência profissional</h2>
+                ${companyLine}
+              </section>
+            </div>
+          </div>
+          <p class="cv-footer">Acesse meu portfólio para mais detalhes sobre meus projetos.</p>
         </div>
-
-        <section class="resume-block full">
-          <h4>Detalhes</h4>
-          <ul class="resume-simple-list">
-            ${detalhesMartinelli}${detalhesTaoa || "<li>N/A</li>"}
-          </ul>
-        </section>
-
-        <section class="resume-block">
-          <h4>Certificados</h4>
-          <ul class="resume-simple-list">${certificados || "<li>N/A</li>"}</ul>
-        </section>
-
-        <section class="resume-block">
-          <h4>Empresas e detalhes</h4>
-          <ul class="resume-simple-list">${empresas || "<li>N/A</li>"}</ul>
-        </section>
       `;
     }
 
-    function openResumePanel() {
+    function openLoadingThenResumePanel() {
+      if (!loadingPanel) {
+        closeThanksPanel({ skipHistory: true });
+        openResumePanel({ replaceHistory: true });
+        return;
+      }
+      const titleEl = loadingPanel.querySelector(".loading-title");
+      const textEl = loadingPanel.querySelector(".loading-text");
+      closeThanksPanel({ skipHistory: true });
+      if (titleEl) titleEl.textContent = "Buscando currículo";
+      if (textEl) textEl.textContent = "Carregando visualização...";
+      clearTimeout(loadingTimer);
+      loadingTimer = null;
+      loadingPanel.classList.add("open");
+      loadingPanel.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      history.replaceState({ appModal: "loadingResume" }, "", window.location.href);
+      loadingTimer = setTimeout(() => {
+        loadingTimer = null;
+        openResumePanel({ replaceHistory: true });
+      }, 2200);
+    }
+
+    function openResumePanel(options = {}) {
       if (!resumePanel) return;
       if (thanksPanel) {
         thanksPanel.classList.remove("open");
         thanksPanel.setAttribute("aria-hidden", "true");
       }
       if (loadingPanel) {
+        restoreLoadingPanelCopy();
         loadingPanel.classList.remove("open");
         loadingPanel.setAttribute("aria-hidden", "true");
       }
@@ -2310,7 +2726,11 @@
       resumePanel.classList.add("open");
       resumePanel.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
-      history.pushState({ appModal: "resume" }, "", window.location.href);
+      if (options.replaceHistory) {
+        history.replaceState({ appModal: "resume" }, "", window.location.href);
+      } else {
+        history.pushState({ appModal: "resume" }, "", window.location.href);
+      }
       resumePanel.focus();
     }
 
@@ -2619,7 +3039,21 @@
     if (companiesTrigger) companiesTrigger.addEventListener("click", openCompaniesPanel);
     if (closeCompaniesBtn) closeCompaniesBtn.addEventListener("click", closeCompaniesPanel);
     if (deployFab) deployFab.addEventListener("click", openLoadingPanel);
-    if (closeThanksBtn) closeThanksBtn.addEventListener("click", closeThanksPanel);
+    if (closeThanksBtn) {
+      closeThanksBtn.addEventListener("click", () => {
+        openLoadingThenResumePanel();
+      });
+    }
+    if (lobbyCurriculumBtn) {
+      lobbyCurriculumBtn.addEventListener("click", () => {
+        openLoadingThenResumePanel();
+      });
+    }
+    if (resumePrintBtn) {
+      resumePrintBtn.addEventListener("click", () => {
+        printCurriculo();
+      });
+    }
     overlay.addEventListener("click", closeCompaniesPanel);
 
     window.addEventListener("afterprint", () => {
