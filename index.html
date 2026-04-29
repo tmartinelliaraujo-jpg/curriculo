@@ -1180,6 +1180,82 @@
       color: #1a1a1a;
     }
 
+    .immersion-intro {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      padding: clamp(14px, 3vw, 26px);
+      background:
+        radial-gradient(circle at 20% 18%, rgba(232, 148, 58, 0.16), transparent 38%),
+        radial-gradient(circle at 82% 75%, rgba(55, 85, 130, 0.16), transparent 42%),
+        rgba(0, 0, 0, 0.92);
+      opacity: 1;
+      transition: opacity 0.28s ease;
+    }
+
+    .immersion-intro.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .immersion-intro-box {
+      width: min(720px, 94vw);
+      border: 1px solid var(--border-dim);
+      background: linear-gradient(200deg, rgba(16, 17, 20, 0.96) 0%, rgba(8, 9, 11, 0.96) 100%);
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.6);
+      padding: clamp(16px, 3vw, 28px);
+      text-align: center;
+    }
+
+    .immersion-intro-kicker {
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+
+    .immersion-intro-title {
+      margin-top: 10px;
+      font-size: clamp(1.5rem, 4vw, 2.35rem);
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .immersion-intro-text {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+      line-height: 1.6;
+    }
+
+    .immersion-start-btn {
+      margin-top: 18px;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      padding: 10px 24px;
+      letter-spacing: 0.16em;
+    }
+
+    .immersion-start-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .immersion-start-btn:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    body.immersion-locked {
+      overflow: hidden;
+    }
+
     .resume-panel .resume-simple-list strong {
       color: #5c5c5c;
       font-weight: 700;
@@ -2016,7 +2092,7 @@
     }
   </style>
 </head>
-<body>
+<body class="immersion-locked">
   <!-- bump: redeploy Netlify — commit trigger -->
   <div class="lobby-scene" aria-hidden="true">
     <div class="lobby-void"></div>
@@ -2146,6 +2222,18 @@
     </div>
   </section>
   <div id="a4ResumePrintRoot" aria-hidden="true"></div>
+  <section class="immersion-intro" id="immersionIntro" aria-modal="true" role="dialog" aria-labelledby="immersionIntroTitle">
+    <div class="immersion-intro-box">
+      <div class="immersion-intro-kicker">Currículo imersivo</div>
+      <h2 class="immersion-intro-title" id="immersionIntroTitle">Bem-vindo à imersão do currículo</h2>
+      <p class="immersion-intro-text">
+        Esta experiência foi pensada para apresentar o currículo de forma interativa, como uma jornada pelos perfis, experiências e habilidades.
+      </p>
+      <button type="button" class="tag-ready immersion-start-btn" id="immersionStartBtn" aria-label="Iniciar imersão">
+        Iniciar imersão
+      </button>
+    </div>
+  </section>
 
   <script>
     const operators = [
@@ -2297,6 +2385,8 @@
     const briefingFourthLabel = document.getElementById("briefingFourthLabel");
     const briefingTime = document.getElementById("briefingTime");
     const briefingPanel = document.querySelector(".briefing-panel");
+    const immersionIntro = document.getElementById("immersionIntro");
+    const immersionStartBtn = document.getElementById("immersionStartBtn");
     const taoaHud = document.getElementById("taoaHud");
     const taoaHudTime = document.getElementById("taoaHudTime");
     const opHudName = document.getElementById("opHudName");
@@ -2311,6 +2401,15 @@
     let loadingTimer = null;
     const LOADING_DEFAULT_TITLE = "Deploy";
     const LOADING_DEFAULT_TEXT = "Processando aprovação do perfil...";
+
+    function unlockImmersion() {
+      if (!immersionIntro) return;
+      immersionIntro.classList.add("is-hidden");
+      document.body.classList.remove("immersion-locked");
+      window.setTimeout(() => {
+        immersionIntro.setAttribute("aria-hidden", "true");
+      }, 300);
+    }
 
     function restoreLoadingPanelCopy() {
       if (!loadingPanel) return;
@@ -3028,6 +3127,9 @@
         printCurriculo();
       });
     }
+    if (immersionStartBtn) {
+      immersionStartBtn.addEventListener("click", unlockImmersion);
+    }
     overlay.addEventListener("click", closeCompaniesPanel);
 
     window.addEventListener("afterprint", () => {
@@ -3189,6 +3291,10 @@
     tickClock();
     setInterval(tickClock, 1000);
     initLobbyOperatorPicks();
+    if (immersionStartBtn && immersionIntro) {
+      immersionIntro.setAttribute("aria-hidden", "false");
+      immersionStartBtn.focus();
+    }
   </script>
 </body>
 </html>
