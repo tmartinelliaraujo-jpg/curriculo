@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LOBBY — Seleção de Perfil</title>
+  <title>Taoa Martinelli │ By Martinelli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
@@ -13,8 +13,8 @@
       --bg-mid: #0a0d14;
       --bg-panel: rgba(14, 15, 18, 0.92);
       --border-dim: rgba(255, 255, 255, 0.08);
-      --orange: #e8943a;
-      --orange-dim: rgba(232, 148, 58, 0.35);
+      --orange: #7c5cff;
+      --orange-dim: rgba(124, 92, 255, 0.35);
       --green-hud: #6ee7a8;
       --red-alert: #e85a4a;
       --text: #e8eaed;
@@ -196,6 +196,22 @@
       padding: 8px 28px;
       min-width: min(92vw, 320px);
       letter-spacing: 0.16em;
+    }
+
+    .site-signature {
+      position: fixed;
+      left: clamp(14px, 2.4vw, 28px);
+      bottom: clamp(12px, 2.2vw, 18px);
+      z-index: 26;
+      pointer-events: none;
+      font-family: "Share Tech Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(232, 234, 237, 0.72);
+      text-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+      user-select: none;
+      white-space: nowrap;
     }
 
     .deploy-fab:hover,
@@ -1155,7 +1171,7 @@
     }
 
     .resume-panel .resume-print-btn:focus-visible {
-      outline: 2px solid #e8943a;
+      outline: 2px solid #7c5cff;
       outline-offset: 2px;
     }
 
@@ -1188,7 +1204,7 @@
       place-items: center;
       padding: clamp(14px, 3vw, 26px);
       background:
-        radial-gradient(circle at 20% 18%, rgba(232, 148, 58, 0.16), transparent 38%),
+        radial-gradient(circle at 20% 18%, rgba(124, 92, 255, 0.16), transparent 38%),
         radial-gradient(circle at 82% 75%, rgba(55, 85, 130, 0.16), transparent 42%),
         rgba(0, 0, 0, 0.92);
       opacity: 1;
@@ -1566,7 +1582,7 @@
       body.printing-a4-only #a4ResumePrintRoot .resume-block h4 {
         font-size: 11.5pt !important;
         margin-bottom: 1.4mm !important;
-        color: #e8943a !important;
+        color: #7c5cff !important;
       }
 
       body.printing-resume .resume-simple-list,
@@ -1607,8 +1623,8 @@
 
       body.printing-resume .tag.highlight,
       body.printing-a4-only #a4ResumePrintRoot .tag.highlight {
-        color: #e8943a !important;
-        border-color: #e8943a !important;
+        color: #7c5cff !important;
+        border-color: #7c5cff !important;
         background: #fff8f0 !important;
         box-shadow: none !important;
         filter: none !important;
@@ -1673,7 +1689,7 @@
     .companies-item:focus-visible,
     .companies-item.is-selected {
       border-color: var(--orange-dim);
-      background: rgba(232, 148, 58, 0.08);
+      background: rgba(124, 92, 255, 0.08);
       outline: none;
     }
 
@@ -2100,12 +2116,13 @@
   </div>
   <div class="scanlines" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
+  <div class="site-signature" aria-hidden="true">2026 © By Martinelli</div>
 
   <div class="app">
     <header class="top-bar">
       <div class="brand">
-        <span class="brand-mark">CURRICULO // LOBBY</span>
-        <div class="brand-title">Seleção <span>de perfil</span></div>
+        <span class="brand-mark">Taoa Martinelli │ By Martinelli</span>
+        <div class="brand-title">Taoa Martinelli <span>│ By Martinelli</span></div>
       </div>
       <div class="status-row">
         <span class="ping" id="clock">SYNC — --:--</span>
